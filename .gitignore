@@ -1,0 +1,30 @@
+# ==== MPLAB X Project Files to Ignore ====
+# Private configuration (contains local absolute paths)
+nbproject/private/
+
+# Build artifacts and temporary outputs
+build/
+build-*/
+dist/
+dist-*/
+*.o
+*.d
+*.elf
+*.cof
+*.map
+*.hex
+*.bin
+*.srec
+*.lst
+
+# Temporary / backup files
+*.log
+*.tmp
+*.bak
+*.orig
+*.old
+
+# OS-specific junk
+.DS_Store
+Thumbs.db
+desktop.ini
