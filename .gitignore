@@ -5,6 +5,13 @@ nbproject/private/*
 nbproject/configurations.xml
 nbproject/Makefile-*.mk
 
+# MPLAB X generated flag files
+.generated_files/
+
+# MCC autosave file (temporary)
+mcc-manifest-autosave.yml
+mcc-manifest-autosave*.yml
+
 # Build artifacts and temporary outputs
 build/
 build-*/
