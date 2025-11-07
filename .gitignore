@@ -1,6 +1,9 @@
 # ==== MPLAB X Project Files to Ignore ====
 # Private configuration (contains local absolute paths)
 nbproject/private/
+nbproject/private/*
+nbproject/configurations.xml
+nbproject/Makefile-*.mk
 
 # Build artifacts and temporary outputs
 build/
