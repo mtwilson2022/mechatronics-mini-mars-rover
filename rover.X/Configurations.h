@@ -44,7 +44,14 @@
 
 
 //************ Enums for state machines ************
+
+// NOTE: ALWAYS DECLARE THE ENUM AS STATIC!!
+
+// state determining the current task the robot should perform
+static enum {LINE_FOLLOW, CANYON_NAV, SAMPLE_COLLECT, SAMPLE_RETURN} robotTaskState;
+// determining actions the robot should perform while in the canyon
 static enum {STRAIGHT, RIGHT, TURN_AROUND} canyonSensorState;
+// determining the robot's actions while following the line
 static enum {GO_CENTER, GO_LEFT, GO_RIGHT, NO_ACTIVE} lineSensorState;
 
 

@@ -150,13 +150,12 @@ void canyonNav() {
 }
 
 
-void delay(float s) {
-    float k = 0;
-    while(k < s)
+void delay(long s) {
+    long k = 0;
+    while (k < s) {
         k++;
+    }
 }
-
-
 
 
 void turnAround() {
@@ -216,3 +215,11 @@ int Collision() {
     return 0;
 }
 
+int senseLineEndOfCanyon() {
+    if (   (RIGHT_LINE_SIG < LINE_SENSOR_THRESHOLD) 
+        || (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD) 
+        || (LEFT_LINE_SIG < LINE_SENSOR_THRESHOLD) ) {
+        return 1;
+    }
+    return 0;
+}

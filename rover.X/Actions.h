@@ -28,10 +28,11 @@ void goStraight();
 
 void moveIntoCanyon();
 
-void delay(float s);
+void delay(long s);
 int senseWallRight();
 int senseWallLight();
 int Collision();
+int senseLineEndOfCanyon();
 
 #endif	/* ACTIONS_H */
 

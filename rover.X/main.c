@@ -29,12 +29,52 @@ int main(int argc, char** argv) {
     LEFT_LED = 0;
     RIGHT_LED = 0;
     
+    robotTaskState = LINE_FOLLOW;
+    
     canyonSensorState = STRAIGHT;
-    lineSensorState = NO_ACTIVE;
+    lineSensorState = GO_CENTER;
     
     while (1) {
-//        canyonNav();
-        lineNav();
+//        switch (robotTaskState) {
+//            case LINE_FOLLOW:
+//                lineNav();
+//                
+//                if (lineSensorState == NO_ACTIVE) {
+//                    robotTaskState = CANYON_NAV;
+//                }
+//                
+//                break;
+//                
+//            case CANYON_NAV:
+//                canyonNav();
+//                
+//                if (senseLineEndOfCanyon()) {
+//                    // put something here to get the robot moving in the right direction
+//                    robotTaskState = LINE_FOLLOW;
+//                }
+//                
+//                break;
+//        }
+        
+        switch (robotTaskState) {
+            case LINE_FOLLOW:
+                lineNav();
+                
+                if ((RIGHT_SONAR_SIG < SONAR_THRESHOLD) && (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD)) {
+                    robotTaskState = SAMPLE_RETURN;
+                }
+                
+                break;
+                
+            case SAMPLE_RETURN:
+                OC2R = 0;
+                OC3R = 0;
+                delay(50000);
+                
+                robotTaskState = LINE_FOLLOW;
+                
+                break;
+        }
     }
     
     return 0;
