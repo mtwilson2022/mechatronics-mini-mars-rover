@@ -16,26 +16,53 @@
 #include "Configurations.h"
 #include "Actions.h"
 
-// Global variables for turning functions
-int steps = 0;          //step counter for stepper MOTOR_ONE
-int N = 0;              // Desired steps for motor one
+// Global variables for turning functions. (Maybe put these in header file?)
+int motorSteps = 0;          //step counter for stepper motor
+int stepsNeeded = 0;         // Desired steps for motor(s))
 
-
+//----------
 //Interrupts
+//----------
 
 // OC2 Interrupt Service Routine MOTOR_ONE
 void __attribute__((interrupt, no_auto_psv)) _OC2Interrupt(void) {
     _OC2IF = 0;
-    steps += 1;
+    motorSteps += 1;
 }
 
 void __attribute__((interrupt, no_auto_psv)) _OC3Interrupt(void) {
     // OC3 Interrupt Service Routine MOTOR_TWO
     _OC3IF = 0;
-    steps += 1;
+    motorSteps += 1;
 }
 
+//------------------------------------------------
+// ********** General purpose functions **********
+//------------------------------------------------
 
+void delay(long s) {
+    long k = 0;
+    while (k < s) {
+        k++;
+    }
+}
+
+//--------------------------------------------------------------------
+// ********** Functions for transitions between task states **********
+//--------------------------------------------------------------------
+
+int senseLineEndOfCanyon() {
+    if (   (RIGHT_LINE_SIG < LINE_SENSOR_THRESHOLD) 
+        || (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD) 
+        || (LEFT_LINE_SIG < LINE_SENSOR_THRESHOLD) ) {
+        return 1;
+    }
+    return 0;
+}
+
+//----------------------------------------------
+//********** Line sensing & following **********
+//----------------------------------------------
 
 void lineNav() {
     switch (lineSensorState) {
@@ -98,6 +125,9 @@ void senseLine(void)    {
     }
 }
 
+//---------------------------------------------------
+//********** Canyon sensing and navigating **********
+//---------------------------------------------------
 
 void canyonNav() {
     switch (canyonSensorState) {
@@ -150,14 +180,6 @@ void canyonNav() {
 }
 
 
-void delay(long s) {
-    long k = 0;
-    while (k < s) {
-        k++;
-    }
-}
-
-
 void turnAround() {
     
     _OC2IE = 0; //stop counting steps
@@ -166,13 +188,13 @@ void turnAround() {
 
     DIRECTION_MOTOR_ONE = 1; //change direction for turn
     DIRECTION_MOTOR_TWO = 1;
-    steps = 0;
-    N = 1200;
+    motorSteps = 0;
+    stepsNeeded = 1200;
     _OC2IE = 1; //enable counting steps again
     OC2R = DUTY; //will start motor
     OC3R = DUTY;
     
-    while (steps <= N) {
+    while (motorSteps <= stepsNeeded) {
         continue;
     }
 }
@@ -186,16 +208,35 @@ void turnRight() {
 
     DIRECTION_MOTOR_ONE = 0; //change direction for turn
     DIRECTION_MOTOR_TWO = 0;
-    steps = 0;
-    N = 600;
+    motorSteps = 0;
+    stepsNeeded = 650;
     _OC2IE = 1; //enable counting steps again
     OC2R = DUTY; //will start motor
     OC3R = DUTY;
     
-    while (steps <= N) {
+    while (motorSteps <= stepsNeeded) {
         continue;
     }
+}
+
+
+void turnLeft() {
     
+    _OC2IE = 0; //stop counting steps
+    OC2R = 0; //stop motor
+    OC3R = 0;
+
+    DIRECTION_MOTOR_ONE = 1; //change direction for turn
+    DIRECTION_MOTOR_TWO = 1;
+    motorSteps = 0;
+    stepsNeeded = 650;
+    _OC2IE = 1; //enable counting steps again
+    OC2R = DUTY; //will start motor
+    OC3R = DUTY;
+    
+    while (motorSteps <= stepsNeeded) {
+        continue;
+    }
 }
 
 
@@ -215,11 +256,61 @@ int Collision() {
     return 0;
 }
 
-int senseLineEndOfCanyon() {
-    if (   (RIGHT_LINE_SIG < LINE_SENSOR_THRESHOLD) 
-        || (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD) 
-        || (LEFT_LINE_SIG < LINE_SENSOR_THRESHOLD) ) {
+//----------------------------------------------------------------
+// ********** Sample collection: sensing and collecting **********
+//----------------------------------------------------------------
+
+
+
+
+//------------------------------------------------------------
+// ********** Sample return: sensing and depositing **********
+//------------------------------------------------------------
+
+/*
+ * If the ball in the collection ramp is white, returns true. If the ball is
+ * black, returns false.
+ */
+int senseBallWhite() {
+    if (BALL_COLOR_SIG < LINE_SENSOR_THRESHOLD) {
         return 1;
     }
     return 0;
 }
+
+
+/*
+ * This function brings the robot directly in front of the black ball return 
+ * box, turns the servo to release the ball into the box, and returns the 
+ * robot to the line, whereupon it resumes line following.
+ */
+void depositBlackBall() {
+    _LATB7 = 0;
+    _LATB8 = 0;
+    _LATB9 = 1;
+    
+    turnRight();
+    OC2R = 0;
+    OC3R = 0;
+    delay(20000);
+    turnLeft();
+    OC2R = 0;
+    OC3R = 0;
+    delay(20000);
+    goStraight();
+}
+
+
+/*
+ * Similar to depositBlackBall(), but brings the robot to the white ball return.
+ */
+void depositWhiteBall() {
+    _LATB7 = 1;
+    _LATB8 = 0;
+    _LATB9 = 0;
+}
+
+
+//---------------------------------------------
+//********** Data transmission tasks **********
+//---------------------------------------------

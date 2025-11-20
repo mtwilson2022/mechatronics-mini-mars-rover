@@ -18,21 +18,38 @@
 #include "Configurations.h"
 
 //************ Function prototypes ************
+// General
+void delay(long s);
+
+// Transitions between tasks
+void moveIntoCanyon(); // this one is maybe not necessary
+int senseLineEndOfCanyon();
+
+
+// Line Following
 void lineNav();
 void senseLine();
 
+// Canyon navigation
 void canyonNav();
 void turnAround();
 void turnRight();
+void turnLeft();
 void goStraight();
-
-void moveIntoCanyon();
-
-void delay(long s);
 int senseWallRight();
 int senseWallLight();
 int Collision();
-int senseLineEndOfCanyon();
+
+// Sample collection
+
+
+// Sample return
+int senseBallWhite();
+void depositBlackBall();
+void depositWhiteBall();
+
+// Data transmission
+
 
 #endif	/* ACTIONS_H */
 

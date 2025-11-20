@@ -31,10 +31,10 @@
 #define IR_SIG ADC1BUF14
 #define IR_SIG_THRESH  500
 
-
 #define LEFT_LINE_SIG  ADC1BUF10
 #define RIGHT_LINE_SIG  ADC1BUF12
 #define CENTER_LINE_SIG  ADC1BUF11
+#define BALL_COLOR_SIG  ADC1BUF9
 #define LINE_SENSOR_THRESHOLD 2048
 
 // Debugging
@@ -42,6 +42,9 @@
 #define LEFT_LED _LATB7
 #define RIGHT_LED _LATB9
 
+
+//************ Global variables ************
+// example: extern int hasBall;  // initialize in the main file
 
 //************ Enums for state machines ************
 

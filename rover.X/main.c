@@ -60,6 +60,10 @@ int main(int argc, char** argv) {
             case LINE_FOLLOW:
                 lineNav();
                 
+                _LATB7 = 0;
+                _LATB8 = 1;
+                _LATB9 = 0;
+                
                 if ((RIGHT_SONAR_SIG < SONAR_THRESHOLD) && (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD)) {
                     robotTaskState = SAMPLE_RETURN;
                 }
@@ -70,6 +74,15 @@ int main(int argc, char** argv) {
                 OC2R = 0;
                 OC3R = 0;
                 delay(50000);
+                
+                if (senseBallWhite()) {
+                    depositWhiteBall();
+                }
+                else {
+                    depositBlackBall();
+                }
+                
+                delay(20000);
                 
                 robotTaskState = LINE_FOLLOW;
                 
