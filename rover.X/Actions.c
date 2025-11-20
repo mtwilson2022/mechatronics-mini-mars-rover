@@ -30,11 +30,11 @@ void __attribute__((interrupt, no_auto_psv)) _OC2Interrupt(void) {
     motorSteps += 1;
 }
 
-// OC3 Interrupt Service Routine MOTOR_TWO
-void __attribute__((interrupt, no_auto_psv)) _OC3Interrupt(void) {
-    _OC3IF = 0;
-    motorSteps += 1;
-}
+//// OC3 Interrupt Service Routine MOTOR_TWO
+//void __attribute__((interrupt, no_auto_psv)) _OC3Interrupt(void) {
+//    _OC3IF = 0;
+//    motorSteps += 1;
+//}
 
 //------------------------------------------------
 // ********** General purpose functions **********
@@ -201,7 +201,7 @@ void turnAround() {
     DIRECTION_MOTOR_ONE = 1; //change direction for turn
     DIRECTION_MOTOR_TWO = 1;
     motorSteps = 0;
-    stepsNeeded = 1200;
+    stepsNeeded = 1150;
     _OC2IE = 1; //enable counting steps again
     OC2R = DUTY; //will start motor
     OC3R = DUTY;
@@ -220,7 +220,7 @@ void turnRight() {
     DIRECTION_MOTOR_ONE = 0; //change direction for turn
     DIRECTION_MOTOR_TWO = 0;
     motorSteps = 0;
-    stepsNeeded = 600;
+    stepsNeeded = 575;
     _OC2IE = 1; //enable counting steps again
     startMotors();
     
@@ -238,7 +238,7 @@ void turnLeft() {
     DIRECTION_MOTOR_ONE = 1; //change direction for turn
     DIRECTION_MOTOR_TWO = 1;
     motorSteps = 0;
-    stepsNeeded = 600;
+    stepsNeeded = 575;
     _OC2IE = 1; //enable counting steps again
     startMotors();
     
@@ -299,10 +299,44 @@ void depositBlackBall() {
     
     turnRight();
     stopMotors();
+    delay(5000);
+    
+    // go forward
+    stepsNeeded = 400;
+    motorSteps = 0;
+    _OC2IE = 0;
+    DIRECTION_MOTOR_ONE = 0;
+    DIRECTION_MOTOR_TWO = 1;
+    startMotors();
+    _OC2IE = 1;
+    while (motorSteps <= stepsNeeded) {
+        continue;
+    }
+    stopMotors();
+    
+    // turn servo to deposit ball
+    delay(5000);
+    OC1R = DROP_BALL;
     delay(20000);
+    OC1R = BLOCK_BALL;
+    
+    // go backward
+    motorSteps = 0;
+    _OC2IE = 0;
+    DIRECTION_MOTOR_ONE = 1;
+    DIRECTION_MOTOR_TWO = 0;
+    startMotors();
+    _OC2IE = 1;
+    while (motorSteps <= stepsNeeded) {
+        continue;
+    }
+    stopMotors();
+    
+    delay(5000);
     turnLeft();
     stopMotors();
-    delay(20000);
+    delay(5000);
+    
     goStraight();
 }
 
@@ -314,6 +348,63 @@ void depositWhiteBall() {
     _LATB7 = 1;
     _LATB8 = 0;
     _LATB9 = 0;
+    
+    // go forward
+    delay(5000);
+    stepsNeeded = 600;
+    motorSteps = 0;
+    _OC2IE = 0;
+    DIRECTION_MOTOR_ONE = 0;
+    DIRECTION_MOTOR_TWO = 1;
+    startMotors();
+    _OC2IE = 1;
+    while (motorSteps <= stepsNeeded) {
+        continue;
+    }
+    stopMotors();
+    delay(5000);
+    
+    turnLeft();
+    stopMotors();
+    delay(5000);
+    
+    // go forward
+    stepsNeeded = 400;
+    motorSteps = 0;
+    _OC2IE = 0;
+    DIRECTION_MOTOR_ONE = 0;
+    DIRECTION_MOTOR_TWO = 1;
+    startMotors();
+    _OC2IE = 1;
+    while (motorSteps <= stepsNeeded) {
+        continue;
+    }
+    stopMotors();
+    
+    // turn servo to deposit ball
+    delay(5000);
+    OC1R = DROP_BALL;
+    delay(20000);
+    OC1R = BLOCK_BALL;
+    
+    // go backward
+    motorSteps = 0;
+    _OC2IE = 0;
+    DIRECTION_MOTOR_ONE = 1;
+    DIRECTION_MOTOR_TWO = 0;
+    startMotors();
+    _OC2IE = 1;
+    while (motorSteps <= stepsNeeded) {
+        continue;
+    }
+    stopMotors();
+    
+    delay(5000);
+    turnRight();
+    stopMotors();
+    delay(5000);
+    
+    goStraight();
 }
 
 //---------------------------------------------

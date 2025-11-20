@@ -111,4 +111,15 @@ void setupMotors() {
     OC2R = 0;
     OC3RS = PERIOD;
     OC3R = 0;
+    
+    // setup the servos
+    OC1CON1 = 0;
+    OC1CON2 = 0;
+    OC1CON1bits.OCTSEL = 0b111;
+    OC1CON1bits.OCM = 0b110;
+    OC1CON2bits.SYNCSEL = 0x1F;
+    OC1CON2bits.OCTRIG = 0;
+    
+    OC1RS = SERVO_PERIOD;
+    OC1R = BLOCK_BALL;
 }

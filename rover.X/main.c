@@ -68,13 +68,15 @@ int main(int argc, char** argv) {
                 
                 if ((RIGHT_SONAR_SIG < SONAR_THRESHOLD) && (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD)) {
                     robotTaskState = SAMPLE_RETURN;
+                    OC2RS = PERIOD;
+                    OC3RS = PERIOD;
                 }
                 
                 break;
                 
             case SAMPLE_RETURN:
                 stopMotors();
-                delay(20000);
+                delay(10000);
                 
                 if (senseBallWhite()) {
                     depositWhiteBall();

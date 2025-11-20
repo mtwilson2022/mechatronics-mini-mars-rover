@@ -37,6 +37,10 @@
 #define BALL_COLOR_SIG  ADC1BUF9
 #define LINE_SENSOR_THRESHOLD 2048
 
+#define SERVO_PERIOD 4999
+#define BLOCK_BALL 250
+#define DROP_BALL 500
+
 // Debugging
 #define STRAIGHT_LED _LATB8
 #define LEFT_LED _LATB7
