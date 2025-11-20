@@ -26,7 +26,7 @@
 
 #define RIGHT_SONAR_SIG ADC1BUF13
 #define FRONT_SONAR_SIG ADC1BUF4
-#define SONAR_THRESHOLD 850
+#define SONAR_THRESHOLD 850  // 850 for 3.3 V; 1280 for 5 V probably gives same result
 
 #define IR_SIG ADC1BUF14
 #define IR_SIG_THRESH  500

@@ -20,6 +20,8 @@
 //************ Function prototypes ************
 // General
 void delay(long s);
+void stopMotors();
+void startMotors();
 
 // Transitions between tasks
 void moveIntoCanyon(); // this one is maybe not necessary

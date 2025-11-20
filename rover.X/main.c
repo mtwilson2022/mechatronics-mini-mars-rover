@@ -56,6 +56,8 @@ int main(int argc, char** argv) {
 //                break;
 //        }
         
+//        canyonNav();
+        
         switch (robotTaskState) {
             case LINE_FOLLOW:
                 lineNav();
@@ -71,9 +73,8 @@ int main(int argc, char** argv) {
                 break;
                 
             case SAMPLE_RETURN:
-                OC2R = 0;
-                OC3R = 0;
-                delay(50000);
+                stopMotors();
+                delay(20000);
                 
                 if (senseBallWhite()) {
                     depositWhiteBall();
@@ -82,7 +83,7 @@ int main(int argc, char** argv) {
                     depositBlackBall();
                 }
                 
-                delay(20000);
+                delay(10000);
                 
                 robotTaskState = LINE_FOLLOW;
                 

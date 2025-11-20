@@ -30,8 +30,8 @@ void __attribute__((interrupt, no_auto_psv)) _OC2Interrupt(void) {
     motorSteps += 1;
 }
 
+// OC3 Interrupt Service Routine MOTOR_TWO
 void __attribute__((interrupt, no_auto_psv)) _OC3Interrupt(void) {
-    // OC3 Interrupt Service Routine MOTOR_TWO
     _OC3IF = 0;
     motorSteps += 1;
 }
@@ -45,6 +45,16 @@ void delay(long s) {
     while (k < s) {
         k++;
     }
+}
+
+void stopMotors() {
+    OC2R = 0;
+    OC3R = 0;
+}
+
+void startMotors() {
+    OC2R = DUTY;
+    OC3R = DUTY;
 }
 
 //--------------------------------------------------------------------
@@ -102,10 +112,9 @@ void lineNav() {
 
 
 void senseLine(void)    {
-    if (
-            !((RIGHT_LINE_SIG < LINE_SENSOR_THRESHOLD) 
-            || (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD) 
-            || (LEFT_LINE_SIG < LINE_SENSOR_THRESHOLD))) 
+    if (!(   (RIGHT_LINE_SIG < LINE_SENSOR_THRESHOLD) 
+          || (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD) 
+          || (LEFT_LINE_SIG < LINE_SENSOR_THRESHOLD))) 
     {
         lineSensorState = NO_ACTIVE;
     }
@@ -152,7 +161,8 @@ void canyonNav() {
                 RIGHT_LED = 0;
                
                 turnAround();
-                delay(40000);
+                stopMotors();
+                delay(10000);
 
                 canyonSensorState = STRAIGHT;
                 
@@ -163,9 +173,11 @@ void canyonNav() {
                 LEFT_LED = 0;
                 STRAIGHT_LED = 0;
                 RIGHT_LED = 1;
-
+                
+                delay(10000);
                 turnRight();
-                delay(40000);
+                stopMotors();
+                delay(10000);
                 
                 if (Collision()) {
                     canyonSensorState = TURN_AROUND;
@@ -203,16 +215,14 @@ void turnAround() {
 void turnRight() {
     
     _OC2IE = 0; //stop counting steps
-    OC2R = 0; //stop motor
-    OC3R = 0;
+    stopMotors();
 
     DIRECTION_MOTOR_ONE = 0; //change direction for turn
     DIRECTION_MOTOR_TWO = 0;
     motorSteps = 0;
-    stepsNeeded = 650;
+    stepsNeeded = 600;
     _OC2IE = 1; //enable counting steps again
-    OC2R = DUTY; //will start motor
-    OC3R = DUTY;
+    startMotors();
     
     while (motorSteps <= stepsNeeded) {
         continue;
@@ -223,16 +233,14 @@ void turnRight() {
 void turnLeft() {
     
     _OC2IE = 0; //stop counting steps
-    OC2R = 0; //stop motor
-    OC3R = 0;
+    stopMotors();
 
     DIRECTION_MOTOR_ONE = 1; //change direction for turn
     DIRECTION_MOTOR_TWO = 1;
     motorSteps = 0;
-    stepsNeeded = 650;
+    stepsNeeded = 600;
     _OC2IE = 1; //enable counting steps again
-    OC2R = DUTY; //will start motor
-    OC3R = DUTY;
+    startMotors();
     
     while (motorSteps <= stepsNeeded) {
         continue;
@@ -290,12 +298,10 @@ void depositBlackBall() {
     _LATB9 = 1;
     
     turnRight();
-    OC2R = 0;
-    OC3R = 0;
+    stopMotors();
     delay(20000);
     turnLeft();
-    OC2R = 0;
-    OC3R = 0;
+    stopMotors();
     delay(20000);
     goStraight();
 }
@@ -309,7 +315,6 @@ void depositWhiteBall() {
     _LATB8 = 0;
     _LATB9 = 0;
 }
-
 
 //---------------------------------------------
 //********** Data transmission tasks **********
