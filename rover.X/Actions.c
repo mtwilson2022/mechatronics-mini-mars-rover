@@ -147,7 +147,7 @@ void canyonNav() {
                 LEFT_LED = 0;
                 RIGHT_LED = 0;
                 
-                goStraight();
+                goStraight(CANYON_SPEED);
 
                 if (Collision()) {
                     canyonSensorState = RIGHT;
@@ -160,9 +160,10 @@ void canyonNav() {
                 STRAIGHT_LED = 0;
                 RIGHT_LED = 0;
                
+                stopMotors();
                 turnAround();
                 stopMotors();
-                delay(10000);
+                delay(5000);
 
                 canyonSensorState = STRAIGHT;
                 
@@ -174,10 +175,11 @@ void canyonNav() {
                 STRAIGHT_LED = 0;
                 RIGHT_LED = 1;
                 
-                delay(10000);
+                stopMotors();
+                delay(5000);
                 turnRight();
                 stopMotors();
-                delay(10000);
+                delay(5000);
                 
                 if (Collision()) {
                     canyonSensorState = TURN_AROUND;
@@ -248,7 +250,18 @@ void turnLeft() {
 }
 
 
-void goStraight() {
+void goStraight(int speed) {
+    if (speed == FULL_SPEED) {
+        // normally, go at full speed (e.g. during line following)
+        OC2RS = PERIOD;
+        OC3RS = PERIOD;
+    }
+    else if (speed == CANYON_SPEED) {
+        // go at half speed while in the canyon
+        OC2RS = PERIOD * 3 / 2;  // if factor of 3/2 is too fast, use factor of 2
+        OC3RS = PERIOD * 3 / 2;
+    }
+    
     _OC2IE = 0;
     OC2R = DUTY;
     OC3R = DUTY;
@@ -337,7 +350,7 @@ void depositBlackBall() {
     stopMotors();
     delay(5000);
     
-    goStraight();
+    goStraight(FULL_SPEED);
 }
 
 
@@ -404,7 +417,7 @@ void depositWhiteBall() {
     stopMotors();
     delay(5000);
     
-    goStraight();
+    goStraight(FULL_SPEED);
 }
 
 //---------------------------------------------

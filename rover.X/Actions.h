@@ -37,7 +37,7 @@ void canyonNav();
 void turnAround();
 void turnRight();
 void turnLeft();
-void goStraight();
+void goStraight(int speed);
 int senseWallRight();
 int senseWallLight();
 int Collision();

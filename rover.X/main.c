@@ -29,68 +29,78 @@ int main(int argc, char** argv) {
     LEFT_LED = 0;
     RIGHT_LED = 0;
     
-    robotTaskState = LINE_FOLLOW;
+    robotTaskState = CANYON_NAV;
     
     canyonSensorState = STRAIGHT;
     lineSensorState = GO_CENTER;
     
     while (1) {
+        switch (robotTaskState) {
+            case LINE_FOLLOW:
+                
+//                STRAIGHT_LED = 0;
+//                LEFT_LED = 0;
+//                RIGHT_LED = 0;
+                
+                lineNav();
+                
+                if (lineSensorState == NO_ACTIVE) {
+                    robotTaskState = CANYON_NAV;
+                }
+                
+                break;
+                
+            case CANYON_NAV:
+                
+//                STRAIGHT_LED = 0;
+//                LEFT_LED = 1;
+//                RIGHT_LED = 1;
+                
+                canyonNav();
+                
+                if (senseLineEndOfCanyon()) {
+                    // put something here to get the robot moving in the right direction
+                    robotTaskState = LINE_FOLLOW;
+                }
+                
+                break;
+        }
+        
+//        canyonNav();
+        
 //        switch (robotTaskState) {
 //            case LINE_FOLLOW:
 //                lineNav();
 //                
-//                if (lineSensorState == NO_ACTIVE) {
-//                    robotTaskState = CANYON_NAV;
+//                _LATB7 = 0;
+//                _LATB8 = 1;
+//                _LATB9 = 0;
+//                
+//                if ((RIGHT_SONAR_SIG < SONAR_THRESHOLD) && (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD)) {
+//                    robotTaskState = SAMPLE_RETURN;
+//                    OC2RS = PERIOD;
+//                    OC3RS = PERIOD;
 //                }
 //                
 //                break;
 //                
-//            case CANYON_NAV:
-//                canyonNav();
+//            case SAMPLE_RETURN:
+//                stopMotors();
+//                delay(10000);
 //                
-//                if (senseLineEndOfCanyon()) {
-//                    // put something here to get the robot moving in the right direction
-//                    robotTaskState = LINE_FOLLOW;
+//                if (senseBallWhite()) {
+//                    depositWhiteBall();
 //                }
+//                else {
+//                    depositBlackBall();
+//                }
+//                
+//                delay(10000);
+//                
+//                robotTaskState = LINE_FOLLOW;
 //                
 //                break;
 //        }
-        
-//        canyonNav();
-        
-        switch (robotTaskState) {
-            case LINE_FOLLOW:
-                lineNav();
-                
-                _LATB7 = 0;
-                _LATB8 = 1;
-                _LATB9 = 0;
-                
-                if ((RIGHT_SONAR_SIG < SONAR_THRESHOLD) && (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD)) {
-                    robotTaskState = SAMPLE_RETURN;
-                    OC2RS = PERIOD;
-                    OC3RS = PERIOD;
-                }
-                
-                break;
-                
-            case SAMPLE_RETURN:
-                stopMotors();
-                delay(10000);
-                
-                if (senseBallWhite()) {
-                    depositWhiteBall();
-                }
-                else {
-                    depositBlackBall();
-                }
-                
-                delay(10000);
-                
-                robotTaskState = LINE_FOLLOW;
-                
-                break;
-        }
     }
     
     return 0;

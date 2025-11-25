@@ -22,6 +22,13 @@
 #define PERIOD 312/2             //@F_cy = 250kHz, 1rev/s in 1/4 step mode = period of 312
 #define DUTY PERIOD*0.5
 
+#define FULL_SPEED 0 // used when setting speed of the motors
+#define CANYON_SPEED 1
+
+#define SERVO_PERIOD 4999
+#define BLOCK_BALL 250
+#define DROP_BALL 500
+
 // Sensing
 
 #define RIGHT_SONAR_SIG ADC1BUF13
@@ -36,10 +43,6 @@
 #define CENTER_LINE_SIG  ADC1BUF11
 #define BALL_COLOR_SIG  ADC1BUF9
 #define LINE_SENSOR_THRESHOLD 2048
-
-#define SERVO_PERIOD 4999
-#define BLOCK_BALL 250
-#define DROP_BALL 500
 
 // Debugging
 #define STRAIGHT_LED _LATB8
