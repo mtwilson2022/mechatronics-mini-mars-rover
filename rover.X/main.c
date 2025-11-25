@@ -17,6 +17,10 @@
 #pragma config SOSCSRC = DIG    // Turn off secondary oscillator on pins 9&10
 
 
+RobotTaskState robotTaskState = LINE_FOLLOW;
+CanyonSensorState canyonSensorState = STRAIGHT;
+LineSensorState lineSensorState = GO_CENTER;
+
 
 int main(int argc, char** argv) {
     _RCDIV = 0b100; // oscillator: divide by 16 postscaling (so Fosc = 500 kHz)
@@ -29,18 +33,18 @@ int main(int argc, char** argv) {
     LEFT_LED = 0;
     RIGHT_LED = 0;
     
-    robotTaskState = CANYON_NAV;
-    
-    canyonSensorState = STRAIGHT;
-    lineSensorState = GO_CENTER;
-    
+//    static RobotTaskState robotTaskState = LINE_FOLLOW;
+//    
+//    CanyonSensorState canyonSensorState = RIGHT;
+//    static LineSensorState lineSensorState = GO_CENTER;
+//    
     while (1) {
         switch (robotTaskState) {
             case LINE_FOLLOW:
                 
-//                STRAIGHT_LED = 0;
-//                LEFT_LED = 0;
-//                RIGHT_LED = 0;
+                STRAIGHT_LED = 0;
+                LEFT_LED = 0;
+                RIGHT_LED = 0;
                 
                 lineNav();
                 
@@ -56,7 +60,7 @@ int main(int argc, char** argv) {
 //                LEFT_LED = 1;
 //                RIGHT_LED = 1;
                 
-                canyonNav();
+                canyonNav(canyonSensorState);
                 
                 if (senseLineEndOfCanyon()) {
                     // put something here to get the robot moving in the right direction

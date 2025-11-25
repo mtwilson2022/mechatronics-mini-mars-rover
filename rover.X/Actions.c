@@ -12,6 +12,7 @@
  * Created on November 6, 2025, 10:12 AM
  */
 
+
 #include <xc.h>
 #include "Configurations.h"
 #include "Actions.h"
@@ -19,6 +20,9 @@
 // Global variables for turning functions. (Maybe put these in header file?)
 int motorSteps = 0;          //step counter for stepper motor
 int stepsNeeded = 0;         // Desired steps for motor(s))
+
+extern CanyonSensorState canyonSensorState;
+extern LineSensorState lineSensorState;
 
 //----------
 //Interrupts
@@ -111,7 +115,7 @@ void lineNav() {
 }
 
 
-void senseLine(void)    {
+void senseLine()    {
     if (!(   (RIGHT_LINE_SIG < LINE_SENSOR_THRESHOLD) 
           || (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD) 
           || (LEFT_LINE_SIG < LINE_SENSOR_THRESHOLD))) 
