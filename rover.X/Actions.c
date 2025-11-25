@@ -17,12 +17,15 @@
 #include "Configurations.h"
 #include "Actions.h"
 
+// state machines that are initialized in the main file, but altered in 
+// the functions contained here
+extern CanyonSensorState canyonSensorState;
+extern LineSensorState lineSensorState;
+
 // Global variables for turning functions. (Maybe put these in header file?)
 int motorSteps = 0;          //step counter for stepper motor
 int stepsNeeded = 0;         // Desired steps for motor(s))
 
-extern CanyonSensorState canyonSensorState;
-extern LineSensorState lineSensorState;
 
 //----------
 //Interrupts
@@ -61,6 +64,26 @@ void startMotors() {
     OC3R = DUTY;
 }
 
+
+void goStraight(int speed) {
+    if (speed == FULL_SPEED) {
+        // normally, go at full speed (e.g. during line following)
+        OC2RS = PERIOD;
+        OC3RS = PERIOD;
+    }
+    else if (speed == CANYON_SPEED) {
+        // go at half speed while in the canyon
+        OC2RS = PERIOD * 2;
+        OC3RS = PERIOD * 2;
+    }
+    
+    _OC2IE = 0;
+    OC2R = DUTY;
+    OC3R = DUTY;
+    DIRECTION_MOTOR_ONE = 0;
+    DIRECTION_MOTOR_TWO = 1;
+}
+
 //--------------------------------------------------------------------
 // ********** Functions for transitions between task states **********
 //--------------------------------------------------------------------
@@ -81,10 +104,7 @@ int senseLineEndOfCanyon() {
 void lineNav() {
     switch (lineSensorState) {
             case GO_CENTER:
-                OC2RS = PERIOD;
-                OC3RS = PERIOD;
-                OC2R = DUTY;
-                OC3R = DUTY;
+                goStraight(FULL_SPEED);
                 senseLine();
                 break;
             
@@ -251,26 +271,6 @@ void turnLeft() {
     while (motorSteps <= stepsNeeded) {
         continue;
     }
-}
-
-
-void goStraight(int speed) {
-    if (speed == FULL_SPEED) {
-        // normally, go at full speed (e.g. during line following)
-        OC2RS = PERIOD;
-        OC3RS = PERIOD;
-    }
-    else if (speed == CANYON_SPEED) {
-        // go at half speed while in the canyon
-        OC2RS = PERIOD * 3 / 2;  // if factor of 3/2 is too fast, use factor of 2
-        OC3RS = PERIOD * 3 / 2;
-    }
-    
-    _OC2IE = 0;
-    OC2R = DUTY;
-    OC3R = DUTY;
-    DIRECTION_MOTOR_ONE = 0;
-    DIRECTION_MOTOR_TWO = 1;
 }
 
 

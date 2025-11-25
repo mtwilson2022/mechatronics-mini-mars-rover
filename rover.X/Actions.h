@@ -22,6 +22,7 @@
 void delay(long s);
 void stopMotors();
 void startMotors();
+void goStraight(int speed);
 
 // Transitions between tasks
 void moveIntoCanyon(); // this one is maybe not necessary
@@ -37,7 +38,6 @@ void canyonNav();
 void turnAround();
 void turnRight();
 void turnLeft();
-void goStraight(int speed);
 int senseWallRight();
 int senseWallLight();
 int Collision();

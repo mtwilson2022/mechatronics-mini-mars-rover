@@ -52,6 +52,12 @@ int main(int argc, char** argv) {
                     robotTaskState = CANYON_NAV;
                 }
                 
+                if ((RIGHT_SONAR_SIG < SONAR_THRESHOLD) && (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD)) {
+                    robotTaskState = SAMPLE_RETURN;
+                    OC2RS = PERIOD;
+                    OC3RS = PERIOD;
+                }
+                
                 break;
                 
             case CANYON_NAV:
@@ -66,6 +72,23 @@ int main(int argc, char** argv) {
                     // put something here to get the robot moving in the right direction
                     robotTaskState = LINE_FOLLOW;
                 }
+                
+                break;
+                
+            case SAMPLE_RETURN:
+                stopMotors();
+                delay(10000);
+                
+                if (senseBallWhite()) {
+                    depositWhiteBall();
+                }
+                else {
+                    depositBlackBall();
+                }
+                
+                delay(10000);
+                
+                robotTaskState = LINE_FOLLOW;
                 
                 break;
         }
