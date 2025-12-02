@@ -30,6 +30,8 @@ void turnLeft();
 // Transitions between tasks
 void moveIntoCanyon(); // this one is maybe not necessary
 int senseLineEndOfCanyon();
+void turnRightGetOnLine();
+void turnLeftGetOnLine();
 
 
 // Line Following
@@ -42,7 +44,7 @@ int senseWallRight();
 int Collision();
 
 // Sample collection
-
+void collectSample();
 
 // Sample return
 int senseBallWhite();

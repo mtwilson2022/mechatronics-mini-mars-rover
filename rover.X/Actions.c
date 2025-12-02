@@ -120,6 +120,10 @@ void turnRight() {
     while (motorSteps <= stepsNeeded) {
         continue;
     }
+    
+    // stop motors at the end of it
+    stopMotors();
+    delay(5000);
 }
 
 
@@ -138,6 +142,9 @@ void turnLeft() {
     while (motorSteps <= stepsNeeded) {
         continue;
     }
+    // stop motors at the end of it
+    stopMotors();
+    delay(5000);
 }
 
 //--------------------------------------------------------------------
@@ -151,6 +158,26 @@ int senseLineEndOfCanyon() {
         return 1;
     }
     return 0;
+}
+
+
+/*
+ * When the rover senses the line, it needs to orient itself correctly 
+ * to ensure that it follows the line in the correct direction. This function
+ * helps the rover turn right, then make sure it's on the line again, before
+ * resuming line following.
+ */
+void turnRightGetOnLine() {
+    stopMotors();
+    turnRight();
+}
+
+/* 
+ * Helps the rover turn left, then make sure it's on the line again, before
+ * resuming line following.
+ */
+void turnLeftGetOnLine() {
+    
 }
 
 //----------------------------------------------
@@ -248,8 +275,6 @@ void canyonNav() {
                 stopMotors();
                 delay(5000);
                 turnLeft();
-                stopMotors();
-                delay(5000);
 
                 canyonSensorState = STRAIGHT;
                 
@@ -264,8 +289,6 @@ void canyonNav() {
                 stopMotors();
                 delay(5000);
                 turnRight();
-                stopMotors();
-                delay(5000);
                 
                 canyonSensorState = STRAIGHT;
 
@@ -294,7 +317,22 @@ int Collision() {
 // ********** Sample collection: sensing and collecting **********
 //----------------------------------------------------------------
 
-
+void collectSample() {
+    turnRight();
+    
+    // go forward
+    stepsNeeded = 400;
+    motorSteps = 0;
+    _OC2IE = 0;
+    DIRECTION_MOTOR_ONE = 0;
+    DIRECTION_MOTOR_TWO = 1;
+    startMotors();
+    _OC2IE = 1;
+    while (motorSteps <= stepsNeeded) {
+        continue;
+    }
+    stopMotors();
+}
 
 
 //------------------------------------------------------------
@@ -324,8 +362,6 @@ void depositBlackBall() {
     _LATB9 = 1;
     
     turnRight();
-    stopMotors();
-    delay(5000);
     
     // go forward
     stepsNeeded = 400;
@@ -360,8 +396,6 @@ void depositBlackBall() {
     
     delay(5000);
     turnLeft();
-    stopMotors();
-    delay(5000);
     
     goStraight(FULL_SPEED);
 }
@@ -391,8 +425,6 @@ void depositWhiteBall() {
     delay(5000);
     
     turnLeft();
-    stopMotors();
-    delay(5000);
     
     // go forward
     stepsNeeded = 400;
@@ -427,8 +459,6 @@ void depositWhiteBall() {
     
     delay(5000);
     turnRight();
-    stopMotors();
-    delay(5000);
     
     goStraight(FULL_SPEED);
 }
