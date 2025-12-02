@@ -52,13 +52,18 @@ int main(int argc, char** argv) {
                     robotTaskState = CANYON_NAV;
                 }
                 
+//                if (SAMPLE_IR_SIG < IR_SIG_THRESH) {
+//                    robotTaskState = SAMPLE_COLLECT;
+//                    goStraight(FULL_SPEED);
+//                } 
+                
                 if ((RIGHT_SONAR_SIG < SONAR_THRESHOLD) && (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD)) {
                     robotTaskState = SAMPLE_RETURN;
-                    OC2RS = PERIOD;
-                    OC3RS = PERIOD;
+                    goStraight(FULL_SPEED);
                 }
                 
                 break;
+                
                 
             case CANYON_NAV:
                 
@@ -69,11 +74,21 @@ int main(int argc, char** argv) {
                 canyonNav(canyonSensorState);
                 
                 if (senseLineEndOfCanyon()) {
-                    // put something here to get the robot moving in the right direction
+                    // *TODO* put something here to get the robot moving in the right direction
                     robotTaskState = LINE_FOLLOW;
                 }
                 
                 break;
+                
+                
+            case SAMPLE_COLLECT:
+                
+                
+                // have the robot back up and get on the line, then:
+                robotTaskState = LINE_FOLLOW;
+                
+                break;
+                
                 
             case SAMPLE_RETURN:
                 stopMotors();
@@ -88,46 +103,12 @@ int main(int argc, char** argv) {
                 
                 delay(10000);
                 
+                // is the robot reliably on the line at this point?
                 robotTaskState = LINE_FOLLOW;
                 
                 break;
         }
-        
-//        canyonNav();
-        
-//        switch (robotTaskState) {
-//            case LINE_FOLLOW:
-//                lineNav();
-//                
-//                _LATB7 = 0;
-//                _LATB8 = 1;
-//                _LATB9 = 0;
-//                
-//                if ((RIGHT_SONAR_SIG < SONAR_THRESHOLD) && (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD)) {
-//                    robotTaskState = SAMPLE_RETURN;
-//                    OC2RS = PERIOD;
-//                    OC3RS = PERIOD;
-//                }
-//                
-//                break;
-//                
-//            case SAMPLE_RETURN:
-//                stopMotors();
-//                delay(10000);
-//                
-//                if (senseBallWhite()) {
-//                    depositWhiteBall();
-//                }
-//                else {
-//                    depositBlackBall();
-//                }
-//                
-//                delay(10000);
-//                
-//                robotTaskState = LINE_FOLLOW;
-//                
-//                break;
-//        }
+
     }
     
     return 0;

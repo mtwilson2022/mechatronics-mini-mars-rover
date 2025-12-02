@@ -84,6 +84,62 @@ void goStraight(int speed) {
     DIRECTION_MOTOR_TWO = 1;
 }
 
+
+void turnAround() {
+    
+    _OC2IE = 0; //stop counting steps
+    OC2R = 0; //stop motor
+    OC3R = 0;
+
+    DIRECTION_MOTOR_ONE = 1; //change direction for turn
+    DIRECTION_MOTOR_TWO = 1;
+    motorSteps = 0;
+    stepsNeeded = 1150;
+    _OC2IE = 1; //enable counting steps again
+    OC2R = DUTY; //will start motor
+    OC3R = DUTY;
+    
+    while (motorSteps <= stepsNeeded) {
+        continue;
+    }
+}
+
+
+void turnRight() {
+    
+    _OC2IE = 0; //stop counting steps
+    stopMotors();
+
+    DIRECTION_MOTOR_ONE = 0; //change direction for turn
+    DIRECTION_MOTOR_TWO = 0;
+    motorSteps = 0;
+    stepsNeeded = 575;
+    _OC2IE = 1; //enable counting steps again
+    startMotors();
+    
+    while (motorSteps <= stepsNeeded) {
+        continue;
+    }
+}
+
+
+void turnLeft() {
+    
+    _OC2IE = 0; //stop counting steps
+    stopMotors();
+
+    DIRECTION_MOTOR_ONE = 1; //change direction for turn
+    DIRECTION_MOTOR_TWO = 1;
+    motorSteps = 0;
+    stepsNeeded = 575;
+    _OC2IE = 1; //enable counting steps again
+    startMotors();
+    
+    while (motorSteps <= stepsNeeded) {
+        continue;
+    }
+}
+
 //--------------------------------------------------------------------
 // ********** Functions for transitions between task states **********
 //--------------------------------------------------------------------
@@ -174,18 +230,24 @@ void canyonNav() {
                 goStraight(CANYON_SPEED);
 
                 if (Collision()) {
-                    canyonSensorState = RIGHT;
+                    if (senseWallRight()) {
+                        canyonSensorState = LEFT;
+                    }
+                    else {
+                        canyonSensorState = RIGHT;
+                    }
                 }
                 
                 break;
                 
-            case TURN_AROUND:
+            case LEFT:
                 LEFT_LED = 1;
                 STRAIGHT_LED = 0;
                 RIGHT_LED = 0;
                
                 stopMotors();
-                turnAround();
+                delay(5000);
+                turnLeft();
                 stopMotors();
                 delay(5000);
 
@@ -205,12 +267,7 @@ void canyonNav() {
                 stopMotors();
                 delay(5000);
                 
-                if (Collision()) {
-                    canyonSensorState = TURN_AROUND;
-                }
-                else {
-                    canyonSensorState = STRAIGHT;
-                }
+                canyonSensorState = STRAIGHT;
 
                 break;
         }
@@ -218,59 +275,11 @@ void canyonNav() {
 }
 
 
-void turnAround() {
-    
-    _OC2IE = 0; //stop counting steps
-    OC2R = 0; //stop motor
-    OC3R = 0;
-
-    DIRECTION_MOTOR_ONE = 1; //change direction for turn
-    DIRECTION_MOTOR_TWO = 1;
-    motorSteps = 0;
-    stepsNeeded = 1150;
-    _OC2IE = 1; //enable counting steps again
-    OC2R = DUTY; //will start motor
-    OC3R = DUTY;
-    
-    while (motorSteps <= stepsNeeded) {
-        continue;
+int senseWallRight() {
+    if (RIGHT_SONAR_SIG < SONAR_THRESHOLD) {
+        return 1;
     }
-}
-
-
-void turnRight() {
-    
-    _OC2IE = 0; //stop counting steps
-    stopMotors();
-
-    DIRECTION_MOTOR_ONE = 0; //change direction for turn
-    DIRECTION_MOTOR_TWO = 0;
-    motorSteps = 0;
-    stepsNeeded = 575;
-    _OC2IE = 1; //enable counting steps again
-    startMotors();
-    
-    while (motorSteps <= stepsNeeded) {
-        continue;
-    }
-}
-
-
-void turnLeft() {
-    
-    _OC2IE = 0; //stop counting steps
-    stopMotors();
-
-    DIRECTION_MOTOR_ONE = 1; //change direction for turn
-    DIRECTION_MOTOR_TWO = 1;
-    motorSteps = 0;
-    stepsNeeded = 575;
-    _OC2IE = 1; //enable counting steps again
-    startMotors();
-    
-    while (motorSteps <= stepsNeeded) {
-        continue;
-    }
+    return 0;
 }
 
 

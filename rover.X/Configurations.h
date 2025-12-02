@@ -29,13 +29,15 @@
 #define BLOCK_BALL 250
 #define DROP_BALL 500
 
+
 // Sensing
 
 #define RIGHT_SONAR_SIG ADC1BUF13
 #define FRONT_SONAR_SIG ADC1BUF4
 #define SONAR_THRESHOLD 850  // 850 for 3.3 V; 1280 for 5 V probably gives same result
 
-#define IR_SIG ADC1BUF14
+#define SAMPLE_IR_SIG ADC1BUF14
+#define SAT_IR_SIG ADC1BUF15
 #define IR_SIG_THRESH  500
 
 #define LEFT_LINE_SIG  ADC1BUF10
@@ -43,6 +45,7 @@
 #define CENTER_LINE_SIG  ADC1BUF11
 #define BALL_COLOR_SIG  ADC1BUF9
 #define LINE_SENSOR_THRESHOLD 2048
+
 
 // Debugging
 #define STRAIGHT_LED _LATB8
@@ -53,18 +56,15 @@
 //************ Global variables ************
 // example: extern int hasBall;  // initialize in the main file
 
-//************ Enums for state machines ************
 
-// NOTE: ALWAYS DECLARE THE ENUM AS STATIC!!
+//************ Enums for state machines ************
 
 // state determining the current task the robot should perform
 typedef enum {LINE_FOLLOW, CANYON_NAV, SAMPLE_COLLECT, SAMPLE_RETURN} RobotTaskState;
 // determining actions the robot should perform while in the canyon
-typedef enum {STRAIGHT, RIGHT, TURN_AROUND} CanyonSensorState;
+typedef enum {STRAIGHT, RIGHT, LEFT} CanyonSensorState;
 // determining the robot's actions while following the line
 typedef enum {GO_CENTER, GO_LEFT, GO_RIGHT, NO_ACTIVE} LineSensorState;
-
-
 
 
 #endif	/* CONFIGURATIONS_H */
