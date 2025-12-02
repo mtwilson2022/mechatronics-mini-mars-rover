@@ -65,6 +65,11 @@ void startMotors() {
 }
 
 
+/* in the speed parameter, pass in one of the following #define statements: 
+ * (from the Configurations.h file)
+ * FULL_SPEED
+ * CANYON_SPEED
+*/
 void goStraight(int speed) {
     if (speed == FULL_SPEED) {
         // normally, go at full speed (e.g. during line following)
@@ -105,7 +110,6 @@ void turnAround() {
     while (motorSteps <= stepsNeeded) {
         continue;
     }
-    
     // stop motors at the end of it
     stopMotors();
     delay(5000);
@@ -130,7 +134,6 @@ void turnRight() {
     while (motorSteps <= stepsNeeded) {
         continue;
     }
-    
     // stop motors at the end of it
     stopMotors();
     delay(5000);
@@ -212,7 +215,6 @@ int senseLineEndOfCanyon() {
     }
     return 0;
 }
-
 
 /*
  * When the rover senses the line, it needs to orient itself correctly 
@@ -391,7 +393,6 @@ int senseBallWhite() {
     return 0;
 }
 
-
 /*
  * This function brings the robot directly in front of the black ball return 
  * box, turns the servo to release the ball into the box, and returns the 
@@ -416,7 +417,6 @@ void depositBlackBall() {
     // may need something to ensure it gets on the line before proceeding
     goStraight(FULL_SPEED);
 }
-
 
 /*
  * Similar to depositBlackBall(), but brings the robot to the white ball return.
@@ -447,3 +447,4 @@ void depositWhiteBall() {
 //---------------------------------------------
 //********** Data transmission tasks **********
 //---------------------------------------------
+

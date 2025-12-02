@@ -29,6 +29,7 @@
 #define BLOCK_BALL 250
 #define DROP_BALL 500
 
+#define LASER _LATA4
 
 // Sensing
 
@@ -60,7 +61,7 @@
 //************ Enums for state machines ************
 
 // state determining the current task the robot should perform
-typedef enum {LINE_FOLLOW, CANYON_NAV, SAMPLE_COLLECT, SAMPLE_RETURN} RobotTaskState;
+typedef enum {LINE_FOLLOW, CANYON_NAV, SAMPLE_COLLECT, SAMPLE_RETURN, DATA_TRANSMIT} RobotTaskState;
 // determining actions the robot should perform while in the canyon
 typedef enum {STRAIGHT, RIGHT, LEFT} CanyonSensorState;
 // determining the robot's actions while following the line
