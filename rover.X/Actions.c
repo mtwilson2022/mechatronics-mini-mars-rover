@@ -85,6 +85,9 @@ void goStraight(int speed) {
 }
 
 
+/*
+ * Executes a 180 degree turn.
+ */
 void turnAround() {
     
     _OC2IE = 0; //stop counting steps
@@ -102,9 +105,16 @@ void turnAround() {
     while (motorSteps <= stepsNeeded) {
         continue;
     }
+    
+    // stop motors at the end of it
+    stopMotors();
+    delay(5000);
 }
 
 
+/*
+ * Executes a 90 degree right turn.
+ */
 void turnRight() {
     
     _OC2IE = 0; //stop counting steps
@@ -127,6 +137,9 @@ void turnRight() {
 }
 
 
+/*
+ * Executes a 90 degree left turn.
+ */
 void turnLeft() {
     
     _OC2IE = 0; //stop counting steps
@@ -143,6 +156,46 @@ void turnLeft() {
         continue;
     }
     // stop motors at the end of it
+    stopMotors();
+    delay(5000);
+}
+
+
+/*
+ * Move forward a preset number of steps.
+ * Useful for sample collection and return
+ */
+void moveForward(int stepsNeeded) {
+    stopMotors();
+    motorSteps = 0;
+    
+    _OC2IE = 0;
+    DIRECTION_MOTOR_ONE = 0;
+    DIRECTION_MOTOR_TWO = 1;
+    
+    startMotors();
+    _OC2IE = 1;
+    while (motorSteps <= stepsNeeded) {
+        continue;
+    }
+    stopMotors();
+    delay(5000);
+}
+
+
+void moveBackward(int stepsNeeded) {
+    stopMotors();
+    motorSteps = 0;
+    
+    _OC2IE = 0;
+    DIRECTION_MOTOR_ONE = 1;
+    DIRECTION_MOTOR_TWO = 0;
+    
+    startMotors();
+    _OC2IE = 1;
+    while (motorSteps <= stepsNeeded) {
+        continue;
+    }
     stopMotors();
     delay(5000);
 }
@@ -319,19 +372,7 @@ int Collision() {
 
 void collectSample() {
     turnRight();
-    
-    // go forward
-    stepsNeeded = 400;
-    motorSteps = 0;
-    _OC2IE = 0;
-    DIRECTION_MOTOR_ONE = 0;
-    DIRECTION_MOTOR_TWO = 1;
-    startMotors();
-    _OC2IE = 1;
-    while (motorSteps <= stepsNeeded) {
-        continue;
-    }
-    stopMotors();
+    moveForward(400);
 }
 
 
@@ -362,41 +403,17 @@ void depositBlackBall() {
     _LATB9 = 1;
     
     turnRight();
-    
-    // go forward
-    stepsNeeded = 400;
-    motorSteps = 0;
-    _OC2IE = 0;
-    DIRECTION_MOTOR_ONE = 0;
-    DIRECTION_MOTOR_TWO = 1;
-    startMotors();
-    _OC2IE = 1;
-    while (motorSteps <= stepsNeeded) {
-        continue;
-    }
-    stopMotors();
+    moveForward(400);
     
     // turn servo to deposit ball
-    delay(5000);
     OC1R = DROP_BALL;
     delay(20000);
     OC1R = BLOCK_BALL;
     
-    // go backward
-    motorSteps = 0;
-    _OC2IE = 0;
-    DIRECTION_MOTOR_ONE = 1;
-    DIRECTION_MOTOR_TWO = 0;
-    startMotors();
-    _OC2IE = 1;
-    while (motorSteps <= stepsNeeded) {
-        continue;
-    }
-    stopMotors();
-    
-    delay(5000);
+    moveBackward(400);
     turnLeft();
     
+    // may need something to ensure it gets on the line before proceeding
     goStraight(FULL_SPEED);
 }
 
@@ -409,57 +426,21 @@ void depositWhiteBall() {
     _LATB8 = 0;
     _LATB9 = 0;
     
-    // go forward
-    delay(5000);
-    stepsNeeded = 600;
-    motorSteps = 0;
-    _OC2IE = 0;
-    DIRECTION_MOTOR_ONE = 0;
-    DIRECTION_MOTOR_TWO = 1;
-    startMotors();
-    _OC2IE = 1;
-    while (motorSteps <= stepsNeeded) {
-        continue;
-    }
-    stopMotors();
-    delay(5000);
-    
+    moveForward(600);
     turnLeft();
     
-    // go forward
-    stepsNeeded = 400;
-    motorSteps = 0;
-    _OC2IE = 0;
-    DIRECTION_MOTOR_ONE = 0;
-    DIRECTION_MOTOR_TWO = 1;
-    startMotors();
-    _OC2IE = 1;
-    while (motorSteps <= stepsNeeded) {
-        continue;
-    }
-    stopMotors();
+    moveForward(400);
+
     
     // turn servo to deposit ball
-    delay(5000);
     OC1R = DROP_BALL;
     delay(20000);
     OC1R = BLOCK_BALL;
     
-    // go backward
-    motorSteps = 0;
-    _OC2IE = 0;
-    DIRECTION_MOTOR_ONE = 1;
-    DIRECTION_MOTOR_TWO = 0;
-    startMotors();
-    _OC2IE = 1;
-    while (motorSteps <= stepsNeeded) {
-        continue;
-    }
-    stopMotors();
-    
-    delay(5000);
+    moveBackward(400);
     turnRight();
     
+    // may need something to ensure it gets on the line before proceeding
     goStraight(FULL_SPEED);
 }
 

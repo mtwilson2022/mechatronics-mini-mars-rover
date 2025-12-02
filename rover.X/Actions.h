@@ -26,6 +26,8 @@ void goStraight(int speed);
 void turnAround();
 void turnRight();
 void turnLeft();
+void moveForward(int stepsNeeded);
+void moveBackward(int stepsNeeded);
 
 // Transitions between tasks
 void moveIntoCanyon(); // this one is maybe not necessary

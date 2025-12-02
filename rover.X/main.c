@@ -52,10 +52,10 @@ int main(int argc, char** argv) {
                     robotTaskState = CANYON_NAV;
                 }
                 
-                if (SAMPLE_IR_SIG > IR_SIG_THRESH) {
-                    robotTaskState = SAMPLE_COLLECT;
-                    goStraight(FULL_SPEED);
-                } 
+//                if (SAMPLE_IR_SIG > IR_SIG_THRESH) {
+//                    robotTaskState = SAMPLE_COLLECT;
+//                    goStraight(FULL_SPEED);
+//                } 
                 
                 if ((RIGHT_SONAR_SIG < SONAR_THRESHOLD) && (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD)) {
                     robotTaskState = SAMPLE_RETURN;
@@ -81,26 +81,18 @@ int main(int argc, char** argv) {
                 break;
                 
                 
-            case SAMPLE_COLLECT:
-                STRAIGHT_LED = 1;
-                LEFT_LED = 1;
-                RIGHT_LED = 1;
-                
-                stopMotors();
-                delay(10000);
-                collectSample();
-                
-                // have the robot back up and get on the line, then:
-                robotTaskState = LINE_FOLLOW;
-                
-                break;
+//            case SAMPLE_COLLECT:
+//                stopMotors();
+//                delay(10000);
+//                collectSample();
+//                
+//                // have the robot back up and get on the line, then:
+//                robotTaskState = LINE_FOLLOW;
+//                
+//                break;
                 
                 
             case SAMPLE_RETURN:
-                STRAIGHT_LED = 1;
-                LEFT_LED = 1;
-                RIGHT_LED = 1;
-                
                 stopMotors();
                 delay(10000);
                 
