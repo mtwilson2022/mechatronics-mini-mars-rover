@@ -42,25 +42,21 @@ int main(int argc, char** argv) {
         switch (robotTaskState) {
             case LINE_FOLLOW:
                 
-                STRAIGHT_LED = 0;
-                LEFT_LED = 0;
-                RIGHT_LED = 0;
-                
                 lineNav();
                 
                 if (lineSensorState == NO_ACTIVE) {
                     robotTaskState = CANYON_NAV;
                 }
                 
-                if (SAMPLE_IR_SIG > IR_SIG_THRESH) {
-                    robotTaskState = SAMPLE_COLLECT;
-                    goStraight(FULL_SPEED);
-                } 
+//                if (SAMPLE_IR_SIG > IR_SIG_THRESH) {
+//                    robotTaskState = SAMPLE_COLLECT;
+//                    goStraight(FULL_SPEED);
+//                } 
                 
-                if ((RIGHT_SONAR_SIG < SONAR_THRESHOLD) && (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD)) {
-                    robotTaskState = SAMPLE_RETURN;
-                    goStraight(FULL_SPEED);
-                }
+//                if ((RIGHT_SONAR_SIG < SONAR_THRESHOLD) && (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD)) {
+//                    robotTaskState = SAMPLE_RETURN;
+//                    goStraight(FULL_SPEED);
+//                }
                 
                 // TODO: add transition to DATA_TRANSMIT
                 

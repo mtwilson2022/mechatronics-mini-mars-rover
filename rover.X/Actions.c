@@ -332,27 +332,27 @@ void canyonNav() {
             
             case STRAIGHT:
 
-                STRAIGHT_LED = 1;
-                LEFT_LED = 0;
-                RIGHT_LED = 0;
+//                STRAIGHT_LED = 1;
+//                LEFT_LED = 0;
+//                RIGHT_LED = 0;
                 
                 goStraight(CANYON_SPEED);
 
                 if (Collision()) {
                     if (senseWallRight()) {
-                        canyonSensorState = LEFT;
+                        canyonSensorState = WALL_RIGHT;
                     }
                     else {
-                        canyonSensorState = RIGHT;
+                        canyonSensorState = WALL_LEFT;
                     }
                 }
                 
                 break;
                 
-            case LEFT:
-                LEFT_LED = 1;
-                STRAIGHT_LED = 0;
-                RIGHT_LED = 0;
+            case WALL_RIGHT:
+//                LEFT_LED = 1;
+//                STRAIGHT_LED = 0;
+//                RIGHT_LED = 0;
                
                 stopMotors();
                 delay(5000);
@@ -362,11 +362,11 @@ void canyonNav() {
                 
                 break;
                 
-            case RIGHT:
+            case WALL_LEFT:
 
-                LEFT_LED = 0;
-                STRAIGHT_LED = 0;
-                RIGHT_LED = 1;
+//                LEFT_LED = 0;
+//                STRAIGHT_LED = 0;
+//                RIGHT_LED = 1;
                 
                 stopMotors();
                 delay(5000);
@@ -401,7 +401,13 @@ int Collision() {
 
 void collectSample() {
     turnRight();
-    moveForward(400);
+    goStraight(CANYON_SPEED); // slow down the robot so it doesn't crash
+    stopMotors();
+    moveForward(400); // number of steps to push the wall to get the sample
+    delay(20000);
+    moveBackward(400);
+    
+    // turn around and get back on the line (transition function)
 }
 
 
