@@ -19,7 +19,7 @@
 
 RobotTaskState robotTaskState = LINE_FOLLOW;
 CanyonSensorState canyonSensorState = STRAIGHT;
-LineSensorState lineSensorState = GO_CENTER;
+LineSensorState lineSensorState = CENTER;
 
 
 int main(int argc, char** argv) {
@@ -97,7 +97,6 @@ int main(int argc, char** argv) {
             case SAMPLE_RETURN:
                 stopMotors();
                 delay(10000);
-                
                 if (senseBallWhite()) {
                     depositWhiteBall();
                 }
@@ -105,7 +104,7 @@ int main(int argc, char** argv) {
                     depositBlackBall();
                 }
                 
-                delay(10000);
+                delay(10000); // instead: turn right/left until on line
                 
                 // is the robot reliably on the line at this point?
                 robotTaskState = LINE_FOLLOW;

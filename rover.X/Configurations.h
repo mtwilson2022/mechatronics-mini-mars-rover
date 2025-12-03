@@ -72,7 +72,7 @@ typedef enum {LINE_FOLLOW, CANYON_NAV, SAMPLE_COLLECT, SAMPLE_RETURN, DATA_TRANS
 // determining actions the robot should perform while in the canyon
 typedef enum {STRAIGHT, RIGHT, LEFT} CanyonSensorState;
 // determining the robot's actions while following the line
-typedef enum {GO_CENTER, GO_LEFT, GO_RIGHT, NO_ACTIVE} LineSensorState;
+typedef enum {LEFT, LEFT_CENTER, CENTER, RIGHT_CENTER, RIGHT, NO_ACTIVE} LineSensorState;
 
 
 #endif	/* CONFIGURATIONS_H */

@@ -240,21 +240,37 @@ void turnLeftGetOnLine() {
 
 void lineNav() {
     switch (lineSensorState) {
-            case GO_CENTER:
+            case CENTER:
                 goStraight(FULL_SPEED);
                 senseLine();
                 break;
             
-            case GO_LEFT:
+            case LEFT_CENTER:
                 OC2RS = PERIOD;
-                OC3RS = PERIOD*3;
+                OC3RS = PERIOD*3/2;
                 OC2R = DUTY;    //OC2 is the right motor
                 OC3R = DUTY;
                 senseLine();
                 break;
                 
-            case GO_RIGHT:
-                OC2RS = PERIOD*3;
+            case LEFT:
+                OC2RS = PERIOD;
+                OC3RS = PERIOD*4;
+                OC2R = DUTY;    //OC2 is the right motor
+                OC3R = DUTY;
+                senseLine();
+                break;
+                
+            case RIGHT_CENTER:
+                OC2RS = PERIOD*3/2;
+                OC3RS = PERIOD;
+                OC2R = DUTY;       //OC2 is the right motor
+                OC3R = DUTY;
+                senseLine();
+                break;
+                
+            case RIGHT:
+                OC2RS = PERIOD*4;
                 OC3RS = PERIOD;
                 OC2R = DUTY;       //OC2 is the right motor
                 OC3R = DUTY;
@@ -272,7 +288,7 @@ void lineNav() {
 }
 
 
-void senseLine()    {
+void senseLine() {    
     if (!(   (RIGHT_LINE_SIG < LINE_SENSOR_THRESHOLD) 
           || (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD) 
           || (LEFT_LINE_SIG < LINE_SENSOR_THRESHOLD))) 
@@ -282,16 +298,28 @@ void senseLine()    {
     else if ((RIGHT_LINE_SIG < LINE_SENSOR_THRESHOLD) 
             && (LEFT_LINE_SIG < LINE_SENSOR_THRESHOLD)) 
     {
-        lineSensorState = GO_CENTER;
+        lineSensorState = CENTER;
     }
-    else if ((RIGHT_LINE_SIG < LINE_SENSOR_THRESHOLD)) {
-        lineSensorState = GO_RIGHT;
+    else if ((RIGHT_LINE_SIG < LINE_SENSOR_THRESHOLD)
+            && (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD)) {
+        lineSensorState = RIGHT_CENTER;
     }
-    else if ((LEFT_LINE_SIG < LINE_SENSOR_THRESHOLD)){
-        lineSensorState = GO_LEFT;
+    else if ((RIGHT_LINE_SIG < LINE_SENSOR_THRESHOLD)
+            && !(CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD)) {
+        lineSensorState = RIGHT;
+    }
+    else if ((LEFT_LINE_SIG < LINE_SENSOR_THRESHOLD)
+            && (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD))
+    {
+        lineSensorState = LEFT_CENTER;
+    }
+    else if ((LEFT_LINE_SIG < LINE_SENSOR_THRESHOLD)
+            && !(CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD))
+    {
+        lineSensorState = LEFT;
     }
     else if (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD) {
-        lineSensorState = GO_CENTER;
+        lineSensorState = CENTER;
     }
 }
 
