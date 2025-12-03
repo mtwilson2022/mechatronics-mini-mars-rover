@@ -19,8 +19,7 @@
 #define DIRECTION_MOTOR_ONE _LATA0      //left motor
 #define DIRECTION_MOTOR_TWO _LATA1      //right motor
 
-//#define PERIOD 312/2             //@F_cy = 250kHz, 1rev/s in 1/4 step mode = period of 312
-#define PERIOD 624               //@F_cy = 2 MHz, period of 624 matches speed in slower oscillator configuration
+#define PERIOD 312/2             //@F_cy = 250kHz, 1rev/s in 1/4 step mode = period of 312
 #define DUTY PERIOD*0.5
 
 #define FULL_SPEED 0 // used when setting speed of the motors
