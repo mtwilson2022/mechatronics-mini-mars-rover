@@ -115,11 +115,9 @@ int main(int argc, char** argv) {
             case DATA_TRANSMIT:
                 // move into lander (this could also be state transition logic)
                 
-                // move the pointer up slowly until it sees IR emitter
-                
-                // if the IR photodiode sees the emitter, then...
-                LASER = 1;
-                delay(50000);
+                // move the pointer up slowly until it sees IR emitter.
+                // then turn on the laser. The course is complete.
+                pointLaser();
                 break;
         }
 

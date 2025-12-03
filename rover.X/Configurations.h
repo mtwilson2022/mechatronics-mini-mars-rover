@@ -29,7 +29,15 @@
 #define BLOCK_BALL 250
 #define DROP_BALL 500
 
+// Laser
+#define TRANSMIT ADC1BUF15
+#define TRANSMIT_THRESHOLD 2000
 #define LASER _LATA4
+
+#define SERVO_PERIOD 4999
+#define SERVO_ANGLE OC1R
+#define HORIZONTAL 250
+#define VERTICAL 500
 
 // Sensing
 
@@ -38,7 +46,6 @@
 #define SONAR_THRESHOLD 850  // 850 for 3.3 V; 1280 for 5 V probably gives same result
 
 #define SAMPLE_IR_SIG ADC1BUF14
-#define SAT_IR_SIG ADC1BUF15
 #define IR_SIG_THRESH  500
 
 #define LEFT_LINE_SIG  ADC1BUF10

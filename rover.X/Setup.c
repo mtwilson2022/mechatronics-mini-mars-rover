@@ -29,6 +29,7 @@ void configurePins() {
     
     _TRISA0 = 0;    //motor one (left) dir
     _TRISA1 = 0;    //motor two (right) dir
+    _TRISA4 = 0;    //laser
     _TRISB7 = 0;    //left led
     _TRISB8 = 0;    //center led
     _TRISB9 = 0;    //right led

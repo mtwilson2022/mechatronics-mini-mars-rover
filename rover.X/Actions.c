@@ -37,11 +37,10 @@ void __attribute__((interrupt, no_auto_psv)) _OC2Interrupt(void) {
     motorSteps += 1;
 }
 
-//// OC3 Interrupt Service Routine MOTOR_TWO
-//void __attribute__((interrupt, no_auto_psv)) _OC3Interrupt(void) {
-//    _OC3IF = 0;
-//    motorSteps += 1;
-//}
+void __attribute__((interrupt, no_auto_psv)) _OC1Interrupt(void) {
+    _OC1IF = 0;
+    SERVO_ANGLE += 1;
+}
 
 //------------------------------------------------
 // ********** General purpose functions **********
@@ -448,3 +447,18 @@ void depositWhiteBall() {
 //********** Data transmission tasks **********
 //---------------------------------------------
 
+void pointLaser() {
+     _OC1IE = 1; // interrupt is taking care of the servo motion
+            
+    while (1) {
+//        SERVO_ANGLE = VERTICAL;
+        
+        if (TRANSMIT > TRANSMIT_THRESHOLD) {
+            _OC1IE = 0;
+            LASER = 1;
+        }
+        else if (SERVO_ANGLE >= VERTICAL) {
+            SERVO_ANGLE = HORIZONTAL;
+        }
+    }
+}
