@@ -23,7 +23,7 @@ LineSensorState lineSensorState = CENTER;
 
 
 int main(int argc, char** argv) {
-    _RCDIV = 0b100; // oscillator: divide by 16 postscaling (so Fosc = 500 kHz)
+    _RCDIV = 0b010; // oscillator: divide by 4 postscaling (so Fosc = 2 MHz)
     
     configurePins();
     setupMotors();
