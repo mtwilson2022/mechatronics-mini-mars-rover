@@ -45,7 +45,10 @@ int main(int argc, char** argv) {
                 lineNav();
                 
                 if (lineSensorState == NO_ACTIVE) {
-                    robotTaskState = CANYON_NAV;
+                    if (checkOffLine()){
+                        robotTaskState = CANYON_NAV;
+                    }
+                    
                 }
                 
 //                if (SAMPLE_IR_SIG > IR_SIG_THRESH) {
@@ -73,6 +76,7 @@ int main(int argc, char** argv) {
                 
                 if (senseLineEndOfCanyon()) {
                     // *TODO* put something here to get the robot moving in the right direction
+                    
                     robotTaskState = LINE_FOLLOW;
                 }
                 
