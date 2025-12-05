@@ -35,27 +35,28 @@ int main(int argc, char** argv) {
                 
                 lineNav();
                 
-                if (lineSensorState == NO_ACTIVE) {
-                    if (checkOffLine()){
-                        robotTaskState = CANYON_NAV;
-                    }
-
-                }
-
-                if (SAMPLE_IR_SIG > IR_SIG_THRESH) {
-                    robotTaskState = SAMPLE_COLLECT;
-                    goStraight(FULL_SPEED);
-                } 
-                
-//                if ((RIGHT_SONAR_SIG < SONAR_THRESHOLD) && (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD)) {
+//                if (lineSensorState == NO_ACTIVE) {
+//                    if (checkOffLine()){
+//                        robotTaskState = CANYON_NAV;
+//                    }
+//
+//                }
+//
+//                if (SAMPLE_IR_SIG > IR_SIG_THRESH) {
+//                    robotTaskState = SAMPLE_COLLECT;
+//                    goStraight(FULL_SPEED);
+//                } 
+//                
+//                if ((RIGHT_SHARP_SIG < RIGHT_SHARP_THRESH) && (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD)) {
 //                    robotTaskState = SAMPLE_RETURN;
 //                    goStraight(FULL_SPEED);
 //                }
                 
                 // TODO: add transition to DATA_TRANSMIT
-//                if (FAR_LEFT_LINE_SIG < LINE_SENSOR_THRESHOLD) {
-//                    
-//                }
+                if ((FAR_LEFT_LINE_SIG < LINE_SENSOR_THRESHOLD) && (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD)) {
+                    robotTaskState = DATA_TRANSMIT;
+                    goStraight(HALF_SPEED);
+                }
                 
                 break;
                 
@@ -106,12 +107,15 @@ int main(int argc, char** argv) {
                 
                 
             case DATA_TRANSMIT:
+                stopMotors();
+                delay(10000);
                 // move into lander (this could also be state transition logic)
-                
+                returnHome();
                 // move the pointer up slowly until it sees IR emitter.
                 // then turn on the laser. The course is complete.
                 pointLaser();
-                break;
+                delay(50000);
+                return 0; // or break?
         }
 
     }

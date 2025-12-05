@@ -259,7 +259,7 @@ void turnRightGetOnLine() {
 void turnLeftGetOnLine() {
     stopMotors();
     delay(5000);
-    moveBackward(200);
+//    moveBackward(200);
     
     // make a ~30 degree right turn
     _OC2IE = 0; //stop counting steps
@@ -267,7 +267,7 @@ void turnLeftGetOnLine() {
     DIRECTION_MOTOR_ONE = 1; //change direction for turn
     DIRECTION_MOTOR_TWO = 1;
     motorSteps = 0;
-    stepsNeeded = 200;
+    stepsNeeded = 300;
     _OC2IE = 1; //enable counting steps again
     startMotors();
     while (motorSteps <= stepsNeeded) {
@@ -595,7 +595,15 @@ void depositWhiteBall() {
 //---------------------------------------------
 
 void returnHome() {
-    
+//    moveBackward(300);
+//    turnLeftGetOnLine();
+//    senseLine();
+//    while (!(lineSensorState == NO_ACTIVE)) {
+//        lineNav();
+//    }
+    moveForward(200); // change until it is centered in the lander
+    turnLeft();
+    moveForward(800);
 }
 
 void pointLaser() {
