@@ -54,6 +54,7 @@ void depositBlackBall();
 void depositWhiteBall();
 
 // Data transmission
+void returnHome();
 void pointLaser();
 
 #endif	/* ACTIONS_H */

@@ -16,8 +16,8 @@
 //************ Define statements ************
 
 // PWM
-#define DIRECTION_MOTOR_ONE _LATA0      //left motor
-#define DIRECTION_MOTOR_TWO _LATA1      //right motor
+#define DIRECTION_MOTOR_ONE _LATB8      //left motor
+#define DIRECTION_MOTOR_TWO _LATB9      //right motor
 
 #define PERIOD 312/2             //@F_cy = 250kHz, 1rev/s in 1/4 step mode = period of 312
 #define DUTY PERIOD*0.5
@@ -49,6 +49,7 @@
 #define SAMPLE_IR_SIG ADC1BUF14
 #define IR_SIG_THRESH  700
 
+#define FAR_LEFT_LINE_SIG ADC1BUF1
 #define LEFT_LINE_SIG  ADC1BUF10
 #define RIGHT_LINE_SIG  ADC1BUF12
 #define CENTER_LINE_SIG  ADC1BUF11
@@ -77,4 +78,3 @@ typedef enum {LEFT, LEFT_CENTER, CENTER, RIGHT_CENTER, RIGHT, NO_ACTIVE} LineSen
 
 
 #endif	/* CONFIGURATIONS_H */
-

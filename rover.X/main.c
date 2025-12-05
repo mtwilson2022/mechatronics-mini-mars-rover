@@ -51,6 +51,9 @@ int main(int argc, char** argv) {
 //                }
                 
                 // TODO: add transition to DATA_TRANSMIT
+//                if (FAR_LEFT_LINE_SIG < LINE_SENSOR_THRESHOLD) {
+//                    
+//                }
                 
                 break;
                 

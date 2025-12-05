@@ -519,6 +519,10 @@ void depositWhiteBall() {
 //********** Data transmission tasks **********
 //---------------------------------------------
 
+void returnHome() {
+    
+}
+
 void pointLaser() {
      _OC1IE = 1; // interrupt is taking care of the servo motion
             
