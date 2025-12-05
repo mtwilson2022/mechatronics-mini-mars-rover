@@ -39,6 +39,7 @@ void turnLeftGetOnLine();
 // Line Following
 void lineNav();
 void senseLine();
+int checkOffLine();
 
 // Canyon navigation
 void canyonNav();
