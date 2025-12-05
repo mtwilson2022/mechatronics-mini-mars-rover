@@ -26,6 +26,7 @@ extern LineSensorState lineSensorState;
 // Global variables for turning functions. (Maybe put these in header file?)
 int motorSteps = 0;          //step counter for stepper motor
 int stepsNeeded = 0;         // Desired steps for motor(s))
+int foundLine = 0;
 
 
 //----------
@@ -209,8 +210,8 @@ void moveBackward(int stepsNeeded) {
 
 int senseLineEndOfTask() {
     if (   (RIGHT_LINE_SIG < LINE_SENSOR_THRESHOLD) 
-        || (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD) 
-        || (LEFT_LINE_SIG < LINE_SENSOR_THRESHOLD) ) {
+        && (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD) 
+        && (LEFT_LINE_SIG < LINE_SENSOR_THRESHOLD) ) {
         return 1;
     }
     return 0;
@@ -225,7 +226,7 @@ int senseLineEndOfTask() {
 void turnRightGetOnLine() {
     stopMotors();
     delay(5000);
-    moveBackward(200);
+//    moveBackward(200);
     
     // make a ~30 degree right turn
     _OC2IE = 0; //stop counting steps
@@ -233,7 +234,7 @@ void turnRightGetOnLine() {
     DIRECTION_MOTOR_ONE = 0; //change direction for turn
     DIRECTION_MOTOR_TWO = 0;
     motorSteps = 0;
-    stepsNeeded = 200;
+    stepsNeeded = 300;
     _OC2IE = 1; //enable counting steps again
     startMotors();
     while (motorSteps <= stepsNeeded) {
@@ -278,7 +279,8 @@ void turnLeftGetOnLine() {
     
     while (1) {
         goStraight(HALF_SPEED);
-        if (LEFT_LINE_SIG < LINE_SENSOR_THRESHOLD) {
+        senseLine();
+        if (!(lineSensorState == NO_ACTIVE)){
             break;
         }
     }     
@@ -384,10 +386,12 @@ void canyonNav() {
                 goStraight(HALF_SPEED);
 
                 if (Collision()) {
-                    if (senseWallRight()) {
+                    stopMotors();
+                    delay(20000);
+                    if (senseWallRight() && Collision()) {
                         canyonSensorState = WALL_RIGHT;
                     }
-                    else {
+                    else if (Collision()){
                         canyonSensorState = WALL_LEFT;
                     }
                 }
@@ -443,9 +447,9 @@ void collectSample() {
     delay(20000);
     moveBackward(400);
     delay(20000);
+    turnLeft();
     
-    
-    // turn around and get back on the line (transition function)
+
 }
 
 
@@ -537,4 +541,73 @@ void pointLaser() {
             SERVO_ANGLE = HORIZONTAL;
         }
     }
+}
+int checkOffLine() {
+    foundLine = 0;
+    OC2R = 0;
+    OC3R = 0;
+    OC2RS = PERIOD * 4;
+    OC3RS = PERIOD * 4;
+    DIRECTION_MOTOR_ONE = 0;
+    DIRECTION_MOTOR_TWO = 0;
+    _OC2IE = 1;
+    motorSteps = 0;
+    OC2R = DUTY;
+    OC3R = DUTY;
+    while (motorSteps <= 384){
+        senseLine();
+        if (!(lineSensorState == NO_ACTIVE)){
+            _OC2IE = 0;
+            OC2R = 0;
+            OC3R = 0;
+            foundLine = 1;
+            break;
+            }
+    }
+    if (foundLine == 0){
+        _OC2IE = 0;
+        OC2R = 0;
+        OC3R = 0;
+        DIRECTION_MOTOR_ONE = 1;
+        DIRECTION_MOTOR_TWO = 1;
+        _OC2IE = 1;
+        motorSteps = 0;
+        OC2R = DUTY;
+        OC3R = DUTY;
+        while (motorSteps <= 384*2){
+            senseLine();
+            if (!(lineSensorState == NO_ACTIVE)){
+                _OC2IE = 0;
+                OC2R = 0;
+                OC3R = 0;
+                foundLine = 1;
+                break;
+                }
+            }
+        }
+    if (foundLine == 0){
+        _OC2IE = 0;
+        OC2R = 0;
+        OC3R = 0;
+        DIRECTION_MOTOR_ONE = 0;
+        DIRECTION_MOTOR_TWO = 0;
+        _OC2IE = 1;
+        motorSteps = 0;
+        OC2R = DUTY;
+        OC3R = DUTY;
+        while (motorSteps <= 384){
+            continue;
+        }
+    }
+    _OC2IE = 0;
+    OC2R = 0;
+    OC3R = 0;
+    OC2RS = PERIOD;
+    OC3RS = PERIOD;
+    DIRECTION_MOTOR_ONE = 0;
+    DIRECTION_MOTOR_TWO = 1;
+    if (foundLine){
+        return 0;
+    }
+    return 1;
 }
