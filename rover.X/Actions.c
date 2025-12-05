@@ -243,7 +243,12 @@ void turnRightGetOnLine() {
     stopMotors();
     delay(5000);
     
-    robotTaskState = TRANSITION;    
+    while (1) {
+        goStraight(HALF_SPEED);
+        if (RIGHT_LINE_SIG < LINE_SENSOR_THRESHOLD) {
+            break;
+        }
+    }   
 }
 
 /* 
@@ -271,7 +276,12 @@ void turnLeftGetOnLine() {
     stopMotors();
     delay(5000);
     
-    robotTaskState = TRANSITION;    
+    while (1) {
+        goStraight(HALF_SPEED);
+        if (LEFT_LINE_SIG < LINE_SENSOR_THRESHOLD) {
+            break;
+        }
+    }     
 }
 
 //----------------------------------------------
@@ -407,7 +417,7 @@ void canyonNav() {
 
 
 int senseWallRight() {
-    if (RIGHT_SONAR_SIG > SONAR_THRESHOLD) {
+    if (RIGHT_SHARP_SIG > RIGHT_SHARP_THRESH) {
         return 1;
     }
     return 0;
@@ -415,7 +425,7 @@ int senseWallRight() {
 
 
 int Collision() {
-    if (FRONT_SONAR_SIG > SONAR_THRESHOLD) {
+    if (FRONT_SHARP_SIG > FRONT_SHARP_THRESH) {
         return 1;
     }
     return 0;

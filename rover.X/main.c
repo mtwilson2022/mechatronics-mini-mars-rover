@@ -64,7 +64,7 @@ int main(int argc, char** argv) {
                 canyonNav(canyonSensorState);
                 
                 if (senseLineEndOfTask()) {
-//                    turnRightGetOnLine();
+                    turnRightGetOnLine();
                     robotTaskState = LINE_FOLLOW;
                 }
                 
@@ -85,7 +85,6 @@ int main(int argc, char** argv) {
             case SAMPLE_RETURN:
                 stopMotors();
                 delay(10000);
-                moveBackward(600); // lately it's been sensing and turning too late. This compensates for it
                 if (senseBallWhite()) {
                     depositWhiteBall();
                 }
@@ -107,16 +106,6 @@ int main(int argc, char** argv) {
                 // move the pointer up slowly until it sees IR emitter.
                 // then turn on the laser. The course is complete.
                 pointLaser();
-                break;
-                
-                
-            case TRANSITION:
-                goStraight(HALF_SPEED);
-                
-                if (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD) {
-                    robotTaskState = LINE_FOLLOW;
-                }
-                
                 break;
         }
 

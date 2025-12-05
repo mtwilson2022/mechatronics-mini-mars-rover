@@ -41,9 +41,10 @@
 
 // Sensing
 
-#define RIGHT_SONAR_SIG ADC1BUF13
-#define FRONT_SONAR_SIG ADC1BUF4
-#define SONAR_THRESHOLD 850  // 850 for 3.3 V; 1280 for 5 V probably gives same result
+#define RIGHT_SHARP_SIG ADC1BUF13
+#define FRONT_SHARP_SIG ADC1BUF4
+#define FRONT_SHARP_THRESH 900
+#define RIGHT_SHARP_THRESH 800 // don't know if we need this yet
 
 #define SAMPLE_IR_SIG ADC1BUF14
 #define IR_SIG_THRESH  700
@@ -68,7 +69,7 @@
 //************ Enums for state machines ************
 
 // state determining the current task the robot should perform
-typedef enum {LINE_FOLLOW, CANYON_NAV, SAMPLE_COLLECT, SAMPLE_RETURN, DATA_TRANSMIT, TRANSITION} RobotTaskState;
+typedef enum {LINE_FOLLOW, CANYON_NAV, SAMPLE_COLLECT, SAMPLE_RETURN, DATA_TRANSMIT} RobotTaskState;
 // determining actions the robot should perform while in the canyon
 typedef enum {STRAIGHT, WALL_RIGHT, WALL_LEFT} CanyonSensorState;
 // determining the robot's actions while following the line
