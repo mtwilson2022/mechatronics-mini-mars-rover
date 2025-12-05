@@ -29,15 +29,6 @@ int main(int argc, char** argv) {
     setupMotors();
     configAD();
     
-    STRAIGHT_LED = 0;
-    LEFT_LED = 0;
-    RIGHT_LED = 0;
-    
-//    static RobotTaskState robotTaskState = LINE_FOLLOW;
-//    
-//    CanyonSensorState canyonSensorState = RIGHT;
-//    static LineSensorState lineSensorState = GO_CENTER;
-//    
     while (1) {
         switch (robotTaskState) {
             case LINE_FOLLOW:
@@ -45,6 +36,7 @@ int main(int argc, char** argv) {
                 lineNav();
                 
                 if (lineSensorState == NO_ACTIVE) {
+                    goStraight(HALF_SPEED);
                     robotTaskState = CANYON_NAV;
                 }
                 
@@ -71,28 +63,29 @@ int main(int argc, char** argv) {
                 
                 canyonNav(canyonSensorState);
                 
-                if (senseLineEndOfCanyon()) {
-                    // *TODO* put something here to get the robot moving in the right direction
+                if (senseLineEndOfTask()) {
+//                    turnRightGetOnLine();
                     robotTaskState = LINE_FOLLOW;
                 }
                 
                 break;
                 
                 
-            case SAMPLE_COLLECT:
-                stopMotors();
-                delay(10000);
-                collectSample();
-                
-                // have the robot back up and get on the line, then:
-                robotTaskState = LINE_FOLLOW;
-                
-                break;
+//            case SAMPLE_COLLECT:
+//                stopMotors();
+//                delay(10000);
+//                collectSample();
+//                
+//                // have the robot back up and get on the line, then:
+//                robotTaskState = LINE_FOLLOW;
+//                
+//                break;
                 
                 
             case SAMPLE_RETURN:
                 stopMotors();
                 delay(10000);
+                moveBackward(600); // lately it's been sensing and turning too late. This compensates for it
                 if (senseBallWhite()) {
                     depositWhiteBall();
                 }
@@ -100,12 +93,13 @@ int main(int argc, char** argv) {
                     depositBlackBall();
                 }
                 
-                delay(10000); // instead: turn right/left until on line
+                delay(5000); // instead: turn right/left until on line
                 
                 // is the robot reliably on the line at this point?
                 robotTaskState = LINE_FOLLOW;
                 
                 break;
+                
                 
             case DATA_TRANSMIT:
                 // move into lander (this could also be state transition logic)
@@ -113,6 +107,16 @@ int main(int argc, char** argv) {
                 // move the pointer up slowly until it sees IR emitter.
                 // then turn on the laser. The course is complete.
                 pointLaser();
+                break;
+                
+                
+            case TRANSITION:
+                goStraight(HALF_SPEED);
+                
+                if (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD) {
+                    robotTaskState = LINE_FOLLOW;
+                }
+                
                 break;
         }
 

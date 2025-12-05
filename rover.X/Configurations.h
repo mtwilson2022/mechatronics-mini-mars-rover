@@ -23,7 +23,7 @@
 #define DUTY PERIOD*0.5
 
 #define FULL_SPEED 0 // used when setting speed of the motors
-#define CANYON_SPEED 1
+#define HALF_SPEED 1
 
 #define SERVO_PERIOD 4999
 #define BLOCK_BALL 250
@@ -46,7 +46,7 @@
 #define SONAR_THRESHOLD 850  // 850 for 3.3 V; 1280 for 5 V probably gives same result
 
 #define SAMPLE_IR_SIG ADC1BUF14
-#define IR_SIG_THRESH  500
+#define IR_SIG_THRESH  700
 
 #define LEFT_LINE_SIG  ADC1BUF10
 #define RIGHT_LINE_SIG  ADC1BUF12
@@ -68,7 +68,7 @@
 //************ Enums for state machines ************
 
 // state determining the current task the robot should perform
-typedef enum {LINE_FOLLOW, CANYON_NAV, SAMPLE_COLLECT, SAMPLE_RETURN, DATA_TRANSMIT} RobotTaskState;
+typedef enum {LINE_FOLLOW, CANYON_NAV, SAMPLE_COLLECT, SAMPLE_RETURN, DATA_TRANSMIT, TRANSITION} RobotTaskState;
 // determining actions the robot should perform while in the canyon
 typedef enum {STRAIGHT, WALL_RIGHT, WALL_LEFT} CanyonSensorState;
 // determining the robot's actions while following the line
