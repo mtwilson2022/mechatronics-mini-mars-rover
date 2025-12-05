@@ -25,6 +25,7 @@ extern LineSensorState lineSensorState;
 // Global variables for turning functions. (Maybe put these in header file?)
 int motorSteps = 0;          //step counter for stepper motor
 int stepsNeeded = 0;         // Desired steps for motor(s))
+int foundLine = 0;
 
 
 //----------
@@ -207,9 +208,10 @@ void moveBackward(int stepsNeeded) {
 //--------------------------------------------------------------------
 
 int senseLineEndOfCanyon() {
-    if (   (RIGHT_LINE_SIG < LINE_SENSOR_THRESHOLD) 
-        || (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD) 
-        || (LEFT_LINE_SIG < LINE_SENSOR_THRESHOLD) ) {
+    senseLine();
+    if (!(lineSensorState == NO_ACTIVE)){
+        OC2R = 0;
+        OC3R = 0;
         return 1;
     }
     return 0;
@@ -495,4 +497,74 @@ void pointLaser() {
             SERVO_ANGLE = HORIZONTAL;
         }
     }
+}
+
+int checkOffLine() {
+    foundLine = 0;
+    OC2R = 0;
+    OC3R = 0;
+    OC2RS = PERIOD * 4;
+    OC3RS = PERIOD * 4;
+    DIRECTION_MOTOR_ONE = 0;
+    DIRECTION_MOTOR_TWO = 0;
+    _OC2IE = 1;
+    motorSteps = 0;
+    OC2R = DUTY;
+    OC3R = DUTY;
+    while (motorSteps <= 384){
+        senseLine();
+        if (!(lineSensorState == NO_ACTIVE)){
+            _OC2IE = 0;
+            OC2R = 0;
+            OC3R = 0;
+            foundLine = 1;
+            break;
+            }
+    }
+    if (foundLine == 0){
+        _OC2IE = 0;
+        OC2R = 0;
+        OC3R = 0;
+        DIRECTION_MOTOR_ONE = 1;
+        DIRECTION_MOTOR_TWO = 1;
+        _OC2IE = 1;
+        motorSteps = 0;
+        OC2R = DUTY;
+        OC3R = DUTY;
+        while (motorSteps <= 384*2){
+            senseLine();
+            if (!(lineSensorState == NO_ACTIVE)){
+                _OC2IE = 0;
+                OC2R = 0;
+                OC3R = 0;
+                foundLine = 1;
+                break;
+                }
+            }
+        }
+    if (foundLine == 0){
+        _OC2IE = 0;
+        OC2R = 0;
+        OC3R = 0;
+        DIRECTION_MOTOR_ONE = 0;
+        DIRECTION_MOTOR_TWO = 0;
+        _OC2IE = 1;
+        motorSteps = 0;
+        OC2R = DUTY;
+        OC3R = DUTY;
+        while (motorSteps <= 384){
+            continue;
+        }
+    }
+    _OC2IE = 0;
+    OC2R = 0;
+    OC3R = 0;
+    OC2RS = PERIOD;
+    OC3RS = PERIOD;
+    DIRECTION_MOTOR_ONE = 0;
+    DIRECTION_MOTOR_TWO = 1;
+    if (foundLine){
+        return 0;
+    }
+    return 1;
 }
