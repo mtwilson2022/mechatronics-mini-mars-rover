@@ -16,8 +16,8 @@
 //************ Define statements ************
 
 // PWM
-#define DIRECTION_MOTOR_ONE _LATA0      //left motor
-#define DIRECTION_MOTOR_TWO _LATA1      //right motor
+#define DIRECTION_MOTOR_ONE _LATB8      //left motor
+#define DIRECTION_MOTOR_TWO _LATB9      //right motor
 
 #define PERIOD 312/2             //@F_cy = 250kHz, 1rev/s in 1/4 step mode = period of 312
 #define DUTY PERIOD*0.5
