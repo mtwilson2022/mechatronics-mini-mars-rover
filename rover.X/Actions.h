@@ -31,7 +31,7 @@ void moveBackward(int stepsNeeded);
 
 // Transitions between tasks
 void moveIntoCanyon(); // this one is maybe not necessary
-int senseLineEndOfCanyon();
+int senseLineEndOfTask();
 void turnRightGetOnLine();
 void turnLeftGetOnLine();
 
@@ -55,6 +55,7 @@ void depositBlackBall();
 void depositWhiteBall();
 
 // Data transmission
+void returnHome();
 void pointLaser();
 
 #endif	/* ACTIONS_H */

@@ -23,7 +23,7 @@
 #define DUTY PERIOD*0.5
 
 #define FULL_SPEED 0 // used when setting speed of the motors
-#define CANYON_SPEED 1
+#define HALF_SPEED 1
 
 #define SERVO_PERIOD 4999
 #define BLOCK_BALL 250
@@ -41,13 +41,15 @@
 
 // Sensing
 
-#define RIGHT_SONAR_SIG ADC1BUF13
-#define FRONT_SONAR_SIG ADC1BUF4
-#define SONAR_THRESHOLD 850  // 850 for 3.3 V; 1280 for 5 V probably gives same result
+#define RIGHT_SHARP_SIG ADC1BUF13
+#define FRONT_SHARP_SIG ADC1BUF4
+#define FRONT_SHARP_THRESH 900
+#define RIGHT_SHARP_THRESH 800 // don't know if we need this yet
 
 #define SAMPLE_IR_SIG ADC1BUF14
-#define IR_SIG_THRESH  500
+#define IR_SIG_THRESH  700
 
+#define FAR_LEFT_LINE_SIG ADC1BUF1
 #define LEFT_LINE_SIG  ADC1BUF10
 #define RIGHT_LINE_SIG  ADC1BUF12
 #define CENTER_LINE_SIG  ADC1BUF11
@@ -76,4 +78,3 @@ typedef enum {LEFT, LEFT_CENTER, CENTER, RIGHT_CENTER, RIGHT, NO_ACTIVE} LineSen
 
 
 #endif	/* CONFIGURATIONS_H */
-

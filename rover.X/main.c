@@ -29,15 +29,6 @@ int main(int argc, char** argv) {
     setupMotors();
     configAD();
     
-    STRAIGHT_LED = 0;
-    LEFT_LED = 0;
-    RIGHT_LED = 0;
-    
-//    static RobotTaskState robotTaskState = LINE_FOLLOW;
-//    
-//    CanyonSensorState canyonSensorState = RIGHT;
-//    static LineSensorState lineSensorState = GO_CENTER;
-//    
     while (1) {
         switch (robotTaskState) {
             case LINE_FOLLOW:
@@ -48,13 +39,13 @@ int main(int argc, char** argv) {
                     if (checkOffLine()){
                         robotTaskState = CANYON_NAV;
                     }
-                    
+
                 }
-                
-//                if (SAMPLE_IR_SIG > IR_SIG_THRESH) {
-//                    robotTaskState = SAMPLE_COLLECT;
-//                    goStraight(FULL_SPEED);
-//                } 
+
+                if (SAMPLE_IR_SIG > IR_SIG_THRESH) {
+                    robotTaskState = SAMPLE_COLLECT;
+                    goStraight(FULL_SPEED);
+                } 
                 
 //                if ((RIGHT_SONAR_SIG < SONAR_THRESHOLD) && (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD)) {
 //                    robotTaskState = SAMPLE_RETURN;
@@ -62,6 +53,9 @@ int main(int argc, char** argv) {
 //                }
                 
                 // TODO: add transition to DATA_TRANSMIT
+//                if (FAR_LEFT_LINE_SIG < LINE_SENSOR_THRESHOLD) {
+//                    
+//                }
                 
                 break;
                 
@@ -74,9 +68,8 @@ int main(int argc, char** argv) {
                 
                 canyonNav(canyonSensorState);
                 
-                if (senseLineEndOfCanyon()) {
-                    // *TODO* put something here to get the robot moving in the right direction
-                    
+                if (senseLineEndOfTask()) {
+                    turnRightGetOnLine();
                     robotTaskState = LINE_FOLLOW;
                 }
                 
@@ -104,12 +97,13 @@ int main(int argc, char** argv) {
                     depositBlackBall();
                 }
                 
-                delay(10000); // instead: turn right/left until on line
+                delay(5000); // instead: turn right/left until on line
                 
                 // is the robot reliably on the line at this point?
                 robotTaskState = LINE_FOLLOW;
                 
                 break;
+                
                 
             case DATA_TRANSMIT:
                 // move into lander (this could also be state transition logic)

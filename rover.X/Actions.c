@@ -19,6 +19,7 @@
 
 // state machines that are initialized in the main file, but altered in 
 // the functions contained here
+extern RobotTaskState robotTaskState;
 extern CanyonSensorState canyonSensorState;
 extern LineSensorState lineSensorState;
 
@@ -76,7 +77,7 @@ void goStraight(int speed) {
         OC2RS = PERIOD;
         OC3RS = PERIOD;
     }
-    else if (speed == CANYON_SPEED) {
+    else if (speed == HALF_SPEED) {
         // go at half speed while in the canyon
         OC2RS = PERIOD * 2;
         OC3RS = PERIOD * 2;
@@ -207,11 +208,10 @@ void moveBackward(int stepsNeeded) {
 // ********** Functions for transitions between task states **********
 //--------------------------------------------------------------------
 
-int senseLineEndOfCanyon() {
-    senseLine();
-    if (!(lineSensorState == NO_ACTIVE)){
-        OC2R = 0;
-        OC3R = 0;
+int senseLineEndOfTask() {
+    if (   (RIGHT_LINE_SIG < LINE_SENSOR_THRESHOLD) 
+        && (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD) 
+        && (LEFT_LINE_SIG < LINE_SENSOR_THRESHOLD) ) {
         return 1;
     }
     return 0;
@@ -225,7 +225,31 @@ int senseLineEndOfCanyon() {
  */
 void turnRightGetOnLine() {
     stopMotors();
-    turnRight();
+    delay(5000);
+//    moveBackward(200);
+    
+    // make a ~30 degree right turn
+    _OC2IE = 0; //stop counting steps
+    stopMotors();
+    DIRECTION_MOTOR_ONE = 0; //change direction for turn
+    DIRECTION_MOTOR_TWO = 0;
+    motorSteps = 0;
+    stepsNeeded = 300;
+    _OC2IE = 1; //enable counting steps again
+    startMotors();
+    while (motorSteps <= stepsNeeded) {
+        continue;
+    }
+    // stop motors at the end of it
+    stopMotors();
+    delay(5000);
+    
+    while (1) {
+        goStraight(HALF_SPEED);
+        if (RIGHT_LINE_SIG < LINE_SENSOR_THRESHOLD) {
+            break;
+        }
+    }   
 }
 
 /* 
@@ -233,7 +257,33 @@ void turnRightGetOnLine() {
  * resuming line following.
  */
 void turnLeftGetOnLine() {
+    stopMotors();
+    delay(5000);
+    moveBackward(200);
     
+    // make a ~30 degree right turn
+    _OC2IE = 0; //stop counting steps
+    stopMotors();
+    DIRECTION_MOTOR_ONE = 1; //change direction for turn
+    DIRECTION_MOTOR_TWO = 1;
+    motorSteps = 0;
+    stepsNeeded = 200;
+    _OC2IE = 1; //enable counting steps again
+    startMotors();
+    while (motorSteps <= stepsNeeded) {
+        continue;
+    }
+    // stop motors at the end of it
+    stopMotors();
+    delay(5000);
+    
+    while (1) {
+        goStraight(HALF_SPEED);
+        senseLine();
+        if (!(lineSensorState == NO_ACTIVE)){
+            break;
+        }
+    }     
 }
 
 //----------------------------------------------
@@ -325,6 +375,77 @@ void senseLine() {
     }
 }
 
+
+int checkOffLine() {
+    foundLine = 0;
+    OC2R = 0;
+    OC3R = 0;
+    OC2RS = PERIOD * 4;
+    OC3RS = PERIOD * 4;
+    DIRECTION_MOTOR_ONE = 0;
+    DIRECTION_MOTOR_TWO = 0;
+    _OC2IE = 1;
+    motorSteps = 0;
+    OC2R = DUTY;
+    OC3R = DUTY;
+    while (motorSteps <= 384){
+        senseLine();
+        if (!(lineSensorState == NO_ACTIVE)){
+            _OC2IE = 0;
+            OC2R = 0;
+            OC3R = 0;
+            foundLine = 1;
+            break;
+            }
+    }
+    if (foundLine == 0){
+        _OC2IE = 0;
+        OC2R = 0;
+        OC3R = 0;
+        DIRECTION_MOTOR_ONE = 1;
+        DIRECTION_MOTOR_TWO = 1;
+        _OC2IE = 1;
+        motorSteps = 0;
+        OC2R = DUTY;
+        OC3R = DUTY;
+        while (motorSteps <= 384*2){
+            senseLine();
+            if (!(lineSensorState == NO_ACTIVE)){
+                _OC2IE = 0;
+                OC2R = 0;
+                OC3R = 0;
+                foundLine = 1;
+                break;
+                }
+            }
+        }
+    if (foundLine == 0){
+        _OC2IE = 0;
+        OC2R = 0;
+        OC3R = 0;
+        DIRECTION_MOTOR_ONE = 0;
+        DIRECTION_MOTOR_TWO = 0;
+        _OC2IE = 1;
+        motorSteps = 0;
+        OC2R = DUTY;
+        OC3R = DUTY;
+        while (motorSteps <= 384){
+            continue;
+        }
+    }
+    _OC2IE = 0;
+    OC2R = 0;
+    OC3R = 0;
+    OC2RS = PERIOD;
+    OC3RS = PERIOD;
+    DIRECTION_MOTOR_ONE = 0;
+    DIRECTION_MOTOR_TWO = 1;
+    if (foundLine){
+        return 0;
+    }
+    return 1;
+}
+
 //---------------------------------------------------
 //********** Canyon sensing and navigating **********
 //---------------------------------------------------
@@ -333,18 +454,15 @@ void canyonNav() {
     switch (canyonSensorState) {
             
             case STRAIGHT:
-
-//                STRAIGHT_LED = 1;
-//                LEFT_LED = 0;
-//                RIGHT_LED = 0;
-                
-                goStraight(CANYON_SPEED);
+                goStraight(HALF_SPEED);
 
                 if (Collision()) {
-                    if (senseWallRight()) {
+                    stopMotors();
+                    delay(20000);
+                    if (senseWallRight() && Collision()) {
                         canyonSensorState = WALL_RIGHT;
                     }
-                    else {
+                    else if (Collision()){
                         canyonSensorState = WALL_LEFT;
                     }
                 }
@@ -352,10 +470,6 @@ void canyonNav() {
                 break;
                 
             case WALL_RIGHT:
-//                LEFT_LED = 1;
-//                STRAIGHT_LED = 0;
-//                RIGHT_LED = 0;
-               
                 stopMotors();
                 delay(5000);
                 turnLeft();
@@ -365,11 +479,6 @@ void canyonNav() {
                 break;
                 
             case WALL_LEFT:
-
-//                LEFT_LED = 0;
-//                STRAIGHT_LED = 0;
-//                RIGHT_LED = 1;
-                
                 stopMotors();
                 delay(5000);
                 turnRight();
@@ -383,7 +492,7 @@ void canyonNav() {
 
 
 int senseWallRight() {
-    if (RIGHT_SONAR_SIG < SONAR_THRESHOLD) {
+    if (RIGHT_SHARP_SIG > RIGHT_SHARP_THRESH) {
         return 1;
     }
     return 0;
@@ -391,7 +500,7 @@ int senseWallRight() {
 
 
 int Collision() {
-    if (FRONT_SONAR_SIG < SONAR_THRESHOLD) {
+    if (FRONT_SHARP_SIG > FRONT_SHARP_THRESH) {
         return 1;
     }
     return 0;
@@ -403,13 +512,15 @@ int Collision() {
 
 void collectSample() {
     turnRight();
-    goStraight(CANYON_SPEED); // slow down the robot so it doesn't crash
+    goStraight(HALF_SPEED); // slow down the robot so it doesn't crash
     stopMotors();
     moveForward(400); // number of steps to push the wall to get the sample
     delay(20000);
     moveBackward(400);
+    delay(20000);
+    turnLeft();
     
-    // turn around and get back on the line (transition function)
+
 }
 
 
@@ -483,6 +594,10 @@ void depositWhiteBall() {
 //********** Data transmission tasks **********
 //---------------------------------------------
 
+void returnHome() {
+    
+}
+
 void pointLaser() {
      _OC1IE = 1; // interrupt is taking care of the servo motion
             
@@ -499,72 +614,3 @@ void pointLaser() {
     }
 }
 
-int checkOffLine() {
-    foundLine = 0;
-    OC2R = 0;
-    OC3R = 0;
-    OC2RS = PERIOD * 4;
-    OC3RS = PERIOD * 4;
-    DIRECTION_MOTOR_ONE = 0;
-    DIRECTION_MOTOR_TWO = 0;
-    _OC2IE = 1;
-    motorSteps = 0;
-    OC2R = DUTY;
-    OC3R = DUTY;
-    while (motorSteps <= 384){
-        senseLine();
-        if (!(lineSensorState == NO_ACTIVE)){
-            _OC2IE = 0;
-            OC2R = 0;
-            OC3R = 0;
-            foundLine = 1;
-            break;
-            }
-    }
-    if (foundLine == 0){
-        _OC2IE = 0;
-        OC2R = 0;
-        OC3R = 0;
-        DIRECTION_MOTOR_ONE = 1;
-        DIRECTION_MOTOR_TWO = 1;
-        _OC2IE = 1;
-        motorSteps = 0;
-        OC2R = DUTY;
-        OC3R = DUTY;
-        while (motorSteps <= 384*2){
-            senseLine();
-            if (!(lineSensorState == NO_ACTIVE)){
-                _OC2IE = 0;
-                OC2R = 0;
-                OC3R = 0;
-                foundLine = 1;
-                break;
-                }
-            }
-        }
-    if (foundLine == 0){
-        _OC2IE = 0;
-        OC2R = 0;
-        OC3R = 0;
-        DIRECTION_MOTOR_ONE = 0;
-        DIRECTION_MOTOR_TWO = 0;
-        _OC2IE = 1;
-        motorSteps = 0;
-        OC2R = DUTY;
-        OC3R = DUTY;
-        while (motorSteps <= 384){
-            continue;
-        }
-    }
-    _OC2IE = 0;
-    OC2R = 0;
-    OC3R = 0;
-    OC2RS = PERIOD;
-    OC3RS = PERIOD;
-    DIRECTION_MOTOR_ONE = 0;
-    DIRECTION_MOTOR_TWO = 1;
-    if (foundLine){
-        return 0;
-    }
-    return 1;
-}
