@@ -21,18 +21,19 @@ void configurePins() {
     _ANSB13 = 1;    //line center sensor
     _ANSB14 = 1;    //line right sensor
     _ANSB2 = 1;     //sonar front sensor
+    _ANSA1 = 1;
     _ANSA2 = 1;     //second sonar sensor
     _ANSA3 = 1;     //IR right sensor
     _ANSB4 = 1;     //IR satellite sensor
     _ANSB15 = 1;    //ball color sensor
     
     
-    _TRISA0 = 0;    //motor one (left) dir
-    _TRISA1 = 0;    //motor two (right) dir
+    _TRISA0 = 0;    // not used
+    _TRISA1 = 1;    //analog input (far left qrd)
     _TRISA4 = 0;    //laser
-    _TRISB7 = 0;    //left led
-    _TRISB8 = 0;    //center led
-    _TRISB9 = 0;    //right led
+    _TRISB7 = 0;    
+    _TRISB8 = 0;    //motor one (left) dir
+    _TRISB9 = 0;    //motor two (right) dir
     _TRISA3 = 1;    //IR right sensor
     _TRISB12 = 1;   //line left sensor
     _TRISB13 = 1;   //line center sensor
