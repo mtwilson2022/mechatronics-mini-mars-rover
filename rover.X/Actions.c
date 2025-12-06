@@ -27,7 +27,6 @@ extern LineSensorState lineSensorState;
 int motorSteps = 0;          //step counter for stepper motor
 int stepsNeeded = 0;         // Desired steps for motor(s))
 int foundLine = 0;
-int sampleReturned = 0;
 
 //----------
 //Interrupts
@@ -268,28 +267,16 @@ int senseLineEndOfTask() {
  * resuming line following.
  */
 void turnRightGetOnLine() {
-    stopMotors();
-    delay(5000);    
-    // make a ~30 degree right turn
-    _OC2IE = 0; //stop counting steps
-    stopMotors();
-    setDirectionRight();
-    motorSteps = 0;
-    stepsNeeded = 300;
-    _OC2IE = 1; //enable counting steps again
-    startMotors();
-    while (motorSteps <= stepsNeeded) {
-        continue;
-    }
-    // stop motors at the end of it
-    stopMotors();
-    delay(5000);
+    goStraight(HALF_SPEED);     //reduces speed
+    stopMotors();    
+    turnSlightRight();
     while (1) {
         goStraight(HALF_SPEED);
         if (RIGHT_LINE_SIG < LINE_SENSOR_THRESHOLD) {
             break;
         }
-    }   
+    }
+    goStraight(FULL_SPEED); //sets speed back to lineNav();
 }
 
 /* 
@@ -297,28 +284,16 @@ void turnRightGetOnLine() {
  * resuming line following.
  */
 void turnLeftGetOnLine() {
-    stopMotors();
-    delay(5000);    
-    // make a ~30 degree right turn
-    _OC2IE = 0; //stop counting steps
-    stopMotors();
-    setDirectionLeft();
-    motorSteps = 0;
-    stepsNeeded = 300;
-    _OC2IE = 1; //enable counting steps again
-    startMotors();
-    while (motorSteps <= stepsNeeded) {
-        continue;
-    }
-    // stop motors at the end of it
-    stopMotors();
-    delay(5000);
+    goStraight(HALF_SPEED); //reduces speed
+    stopMotors();  
+    turnSlightLeft();
     while (1) {
         goStraight(HALF_SPEED);
         if (LEFT_LINE_SIG < LINE_SENSOR_THRESHOLD) {
             break;
         }
     } 
+    goStraight(FULL_SPEED); //sets speed back to lineNav.
 }
 
 //----------------------------------------------
@@ -477,16 +452,15 @@ int Collision() {
 //----------------------------------------------------------------
 
 void collectSample() {
+    delay(5000);
+    goStraight(QUARTER_SPEED); // slow down the robot so it doesn't crash
+    moveForward(150);
     turnRight();
-    goStraight(HALF_SPEED); // slow down the robot so it doesn't crash
-    stopMotors();
-    moveForward(400); // number of steps to push the wall to get the sample
+    moveForward(825); // number of steps to push the wall to get the sample
     delay(20000);
-    moveBackward(400);
-    delay(20000);
+    moveBackward(300);
     turnLeft();
-    
-
+    turnLeftGetOnLine();
 }
 
 
@@ -511,51 +485,42 @@ int senseBallWhite() {
  * robot to the line, whereupon it resumes line following.
  */
 void depositBlackBall() {
-    _LATB7 = 0;
-    _LATB8 = 0;
-    _LATB9 = 1;
-    
+    goStraight(HALF_SPEED);     //sets speed to half
+    stopMotors();
     turnRight();
-    moveForward(400);
-    
-    // turn servo to deposit ball
-    OC1R = DROP_BALL;
+    delay(5000);
+    moveForward(350);   //if ball drops not far enough to box, increase.
+    delay(5000);
+    OC1R = DROP_BALL;   // turn servo to deposit ball
     delay(20000);
     OC1R = BLOCK_BALL;
-    
-    moveBackward(400);
+    moveBackward(350);
+    delay(5000);
     turnLeft();
-    
-    // may need something to ensure it gets on the line before proceeding
-    goStraight(FULL_SPEED);
-    sampleReturned = 1;
+    delay(5000);
+    goStraight(FULL_SPEED); //sets speed back to lineNav speed.
 }
 
 /*
  * Similar to depositBlackBall(), but brings the robot to the white ball return.
  */
 void depositWhiteBall() {
-    _LATB7 = 1;
-    _LATB8 = 0;
-    _LATB9 = 0;
-    
-    moveForward(600);
+    goStraight(HALF_SPEED);     //sets speed to half
+    stopMotors();
+    moveForward(600);       //if ball drops too far left, increase.
+    delay(5000);
     turnLeft();
-    
-    moveForward(400);
-
-    
-    // turn servo to deposit ball
-    OC1R = DROP_BALL;
+    delay(5000);
+    moveForward(350);   //if ball drops not far enough to box, increase. 
+    delay(5000);
+    OC1R = DROP_BALL;   // turn servo to deposit ball
     delay(20000);
     OC1R = BLOCK_BALL;
-    
-    moveBackward(400);
+    moveBackward(350);  
+    delay(5000);
     turnRight();
-    
-    // may need something to ensure it gets on the line before proceeding
-    goStraight(FULL_SPEED);
-    sampleReturned = 1;
+    delay(5000);
+    goStraight(FULL_SPEED); //sets speed back to lineNav speed.
 }
 
 //---------------------------------------------
