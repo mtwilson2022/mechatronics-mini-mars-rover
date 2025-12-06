@@ -27,7 +27,7 @@ extern LineSensorState lineSensorState;
 int motorSteps = 0;          //step counter for stepper motor
 int stepsNeeded = 0;         // Desired steps for motor(s))
 int foundLine = 0;
-
+int sampleReturned = 0;
 
 //----------
 //Interrupts
@@ -269,14 +269,11 @@ int senseLineEndOfTask() {
  */
 void turnRightGetOnLine() {
     stopMotors();
-    delay(5000);
-//    moveBackward(200);
-    
+    delay(5000);    
     // make a ~30 degree right turn
     _OC2IE = 0; //stop counting steps
     stopMotors();
-    DIRECTION_MOTOR_ONE = 0; //change direction for turn
-    DIRECTION_MOTOR_TWO = 0;
+    setDirectionRight();
     motorSteps = 0;
     stepsNeeded = 300;
     _OC2IE = 1; //enable counting steps again
@@ -287,7 +284,6 @@ void turnRightGetOnLine() {
     // stop motors at the end of it
     stopMotors();
     delay(5000);
-    
     while (1) {
         goStraight(HALF_SPEED);
         if (RIGHT_LINE_SIG < LINE_SENSOR_THRESHOLD) {
@@ -302,16 +298,13 @@ void turnRightGetOnLine() {
  */
 void turnLeftGetOnLine() {
     stopMotors();
-    delay(5000);
-    moveBackward(200);
-    
+    delay(5000);    
     // make a ~30 degree right turn
     _OC2IE = 0; //stop counting steps
     stopMotors();
-    DIRECTION_MOTOR_ONE = 1; //change direction for turn
-    DIRECTION_MOTOR_TWO = 1;
+    setDirectionLeft();
     motorSteps = 0;
-    stepsNeeded = 200;
+    stepsNeeded = 300;
     _OC2IE = 1; //enable counting steps again
     startMotors();
     while (motorSteps <= stepsNeeded) {
@@ -320,14 +313,12 @@ void turnLeftGetOnLine() {
     // stop motors at the end of it
     stopMotors();
     delay(5000);
-    
     while (1) {
         goStraight(HALF_SPEED);
-        senseLine();
-        if (!(lineSensorState == NO_ACTIVE)){
+        if (LEFT_LINE_SIG < LINE_SENSOR_THRESHOLD) {
             break;
         }
-    }     
+    } 
 }
 
 //----------------------------------------------
@@ -537,6 +528,7 @@ void depositBlackBall() {
     
     // may need something to ensure it gets on the line before proceeding
     goStraight(FULL_SPEED);
+    sampleReturned = 1;
 }
 
 /*
@@ -563,6 +555,7 @@ void depositWhiteBall() {
     
     // may need something to ensure it gets on the line before proceeding
     goStraight(FULL_SPEED);
+    sampleReturned = 1;
 }
 
 //---------------------------------------------
