@@ -65,6 +65,20 @@ void startMotors() {
     OC3R = DUTY;
 }
 
+void setDirectionRight(){
+    DIRECTION_MOTOR_ONE = 0;
+    DIRECTION_MOTOR_TWO = 0;
+}
+
+void setDirectionLeft(){
+    DIRECTION_MOTOR_ONE = 1;
+    DIRECTION_MOTOR_TWO = 1;
+}
+
+void setDirectionStraight(){
+    DIRECTION_MOTOR_ONE = 0;
+    DIRECTION_MOTOR_TWO = 1;
+}
 
 /* in the speed parameter, pass in one of the following #define statements: 
  * (from the Configurations.h file)
@@ -84,10 +98,10 @@ void goStraight(int speed) {
     }
     
     _OC2IE = 0;
-    OC2R = DUTY;
-    OC3R = DUTY;
     DIRECTION_MOTOR_ONE = 0;
     DIRECTION_MOTOR_TWO = 1;
+    OC2R = DUTY;
+    OC3R = DUTY;
 }
 
 
@@ -121,17 +135,14 @@ void turnAround() {
  * Executes a 90 degree right turn.
  */
 void turnRight() {
-    
     _OC2IE = 0; //stop counting steps
     stopMotors();
-
     DIRECTION_MOTOR_ONE = 0; //change direction for turn
     DIRECTION_MOTOR_TWO = 0;
     motorSteps = 0;
-    stepsNeeded = 575;
+    stepsNeeded = RIGHT_TURN_STEPS;
     _OC2IE = 1; //enable counting steps again
     startMotors();
-    
     while (motorSteps <= stepsNeeded) {
         continue;
     }
@@ -139,23 +150,19 @@ void turnRight() {
     stopMotors();
     delay(5000);
 }
-
 
 /*
  * Executes a 90 degree left turn.
  */
 void turnLeft() {
-    
     _OC2IE = 0; //stop counting steps
     stopMotors();
-
     DIRECTION_MOTOR_ONE = 1; //change direction for turn
     DIRECTION_MOTOR_TWO = 1;
     motorSteps = 0;
-    stepsNeeded = 575;
+    stepsNeeded = LEFT_TURN_STEPS;
     _OC2IE = 1; //enable counting steps again
     startMotors();
-    
     while (motorSteps <= stepsNeeded) {
         continue;
     }
@@ -163,6 +170,43 @@ void turnLeft() {
     stopMotors();
     delay(5000);
 }
+
+// 45 degree right turn
+void turnSlightRight() {
+    _OC2IE = 0; //stop counting steps
+    stopMotors();
+    DIRECTION_MOTOR_ONE = 0; //change direction for turn
+    DIRECTION_MOTOR_TWO = 0;
+    motorSteps = 0;
+    stepsNeeded = RIGHT_TURN_STEPS/2;
+    _OC2IE = 1; //enable counting steps again
+    startMotors();
+    while (motorSteps <= stepsNeeded) {
+        continue;
+    }
+    // stop motors at the end of it
+    stopMotors();
+    delay(5000);
+}
+
+//45 degree left turn
+void turnSlightLeft() {
+    _OC2IE = 0; //stop counting steps
+    stopMotors();
+    DIRECTION_MOTOR_ONE = 1; //change direction for turn
+    DIRECTION_MOTOR_TWO = 1;
+    motorSteps = 0;
+    stepsNeeded = LEFT_TURN_STEPS/2;
+    _OC2IE = 1; //enable counting steps again
+    startMotors();
+    while (motorSteps <= stepsNeeded) {
+        continue;
+    }
+    // stop motors at the end of it
+    stopMotors();
+    delay(5000);
+}
+
 
 
 /*
@@ -387,7 +431,7 @@ void canyonNav() {
 
                 if (Collision()) {
                     stopMotors();
-                    delay(20000);
+                    delay(5000);
                     if (senseWallRight() && Collision()) {
                         canyonSensorState = WALL_RIGHT;
                     }
@@ -401,8 +445,9 @@ void canyonNav() {
             case WALL_RIGHT:
                 stopMotors();
                 delay(5000);
+                OC2RS = PERIOD * 4;
+                OC3RS = PERIOD * 4;
                 turnLeft();
-
                 canyonSensorState = STRAIGHT;
                 
                 break;
@@ -410,8 +455,9 @@ void canyonNav() {
             case WALL_LEFT:
                 stopMotors();
                 delay(5000);
+                OC2RS = PERIOD * 4;
+                OC3RS = PERIOD * 4;
                 turnRight();
-                
                 canyonSensorState = STRAIGHT;
 
                 break;
@@ -531,7 +577,6 @@ void pointLaser() {
      _OC1IE = 1; // interrupt is taking care of the servo motion
             
     while (1) {
-//        SERVO_ANGLE = VERTICAL;
         
         if (TRANSMIT > TRANSMIT_THRESHOLD) {
             _OC1IE = 0;
@@ -542,72 +587,92 @@ void pointLaser() {
         }
     }
 }
+
+//if robot goes off the line during lineNav, this will turn right then left slightly to try to find the line again.
+//If does not find a line, will enter canyonNav.
 int checkOffLine() {
+    stopMotors();
     foundLine = 0;
-    OC2R = 0;
-    OC3R = 0;
-    OC2RS = PERIOD * 4;
+    OC2RS = PERIOD * 4; //set speed to 1/4th
     OC3RS = PERIOD * 4;
-    DIRECTION_MOTOR_ONE = 0;
-    DIRECTION_MOTOR_TWO = 0;
-    _OC2IE = 1;
-    motorSteps = 0;
-    OC2R = DUTY;
-    OC3R = DUTY;
-    while (motorSteps <= 384){
-        senseLine();
-        if (!(lineSensorState == NO_ACTIVE)){
-            _OC2IE = 0;
-            OC2R = 0;
-            OC3R = 0;
+    if (checkRight()){
+        foundLine = 1;
+    }
+    if (foundLine == 0){
+        if (checkLeft()){
             foundLine = 1;
-            break;
-            }
-    }
-    if (foundLine == 0){
-        _OC2IE = 0;
-        OC2R = 0;
-        OC3R = 0;
-        DIRECTION_MOTOR_ONE = 1;
-        DIRECTION_MOTOR_TWO = 1;
-        _OC2IE = 1;
-        motorSteps = 0;
-        OC2R = DUTY;
-        OC3R = DUTY;
-        while (motorSteps <= 384*2){
-            senseLine();
-            if (!(lineSensorState == NO_ACTIVE)){
-                _OC2IE = 0;
-                OC2R = 0;
-                OC3R = 0;
-                foundLine = 1;
-                break;
-                }
-            }
-        }
-    if (foundLine == 0){
-        _OC2IE = 0;
-        OC2R = 0;
-        OC3R = 0;
-        DIRECTION_MOTOR_ONE = 0;
-        DIRECTION_MOTOR_TWO = 0;
-        _OC2IE = 1;
-        motorSteps = 0;
-        OC2R = DUTY;
-        OC3R = DUTY;
-        while (motorSteps <= 384){
-            continue;
         }
     }
-    _OC2IE = 0;
-    OC2R = 0;
-    OC3R = 0;
+    OC2RS = PERIOD; //reset speed to not interfere with lineNav.
     OC2RS = PERIOD;
-    OC3RS = PERIOD;
-    DIRECTION_MOTOR_ONE = 0;
-    DIRECTION_MOTOR_TWO = 1;
-    if (foundLine){
+    if (foundLine == 1){
         return 0;
     }
     return 1;
 }
+
+int checkRight(){
+    delay(5000);
+    setDirectionRight();
+    _OC2IE = 1;
+    motorSteps = 0;
+    startMotors();
+    while (motorSteps <= RIGHT_TURN_STEPS/2){   //turns up to 45degree, sensing for line.
+        senseLine();
+        if (lineSensorState != NO_ACTIVE){
+            _OC2IE = 0;
+            stopMotors();
+            delay(5000);   //delay and double check to ensure sensor is correctly sensing.
+            if (lineSensorState != NO_ACTIVE){
+                return 1;               //return 1 if a line is sensed. Robot is now stopped on the line.
+            }                     //continues if double-check shows false positive
+            _OC2IE = 1;
+            startMotors();
+        }
+    }
+    stopMotors();
+    delay(5000);
+    setDirectionLeft();
+    motorSteps = 0;
+    startMotors();
+    while (motorSteps <= LEFT_TURN_STEPS/2){   //returns robot to front face if no line sensed
+        continue;
+    }
+    stopMotors();
+    _OC2IE = 0;
+    return 0;
+}
+
+int checkLeft(){
+    delay(5000);
+    setDirectionLeft();
+    _OC2IE = 1;
+    motorSteps = 0;
+    startMotors();
+    while (motorSteps <= LEFT_TURN_STEPS/2){   //turns up to 45degree, sensing for line.
+        senseLine();
+        if (lineSensorState != NO_ACTIVE){
+            _OC2IE = 0;
+            stopMotors();
+            delay(5000);   //delay and double check to ensure sensor is correctly sensing.
+            if (lineSensorState != NO_ACTIVE){
+                return 1;               //return 1 if a line is sensed. Robot is now stopped on the line.
+            }                     //continues if double-check shows false positive
+            _OC2IE = 1;
+            startMotors();
+        }
+    }
+    stopMotors();
+    delay(5000);
+    setDirectionRight();
+    motorSteps = 0;
+    startMotors();
+    while (motorSteps <= RIGHT_TURN_STEPS/2){   //returns robot to front face if no line sensed
+        continue;
+    }
+    stopMotors();
+    _OC2IE = 0;
+    return 0;
+}
+
+
