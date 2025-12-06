@@ -24,6 +24,9 @@
 
 #define FULL_SPEED 0 // used when setting speed of the motors
 #define HALF_SPEED 1
+#define QUARTER_SPEED 2
+#define RIGHT_TURN_STEPS 557
+#define LEFT_TURN_STEPS 557
 
 #define SERVO_PERIOD 4999
 #define BLOCK_BALL 250
@@ -31,7 +34,7 @@
 
 // Laser
 #define TRANSMIT ADC1BUF15
-#define TRANSMIT_THRESHOLD 2000
+#define TRANSMIT_THRESHOLD 500
 #define LASER _LATA4
 
 #define SERVO_PERIOD 4999
@@ -43,8 +46,9 @@
 
 #define RIGHT_SHARP_SIG ADC1BUF13
 #define FRONT_SHARP_SIG ADC1BUF4
-#define FRONT_SHARP_THRESH 900
-#define RIGHT_SHARP_THRESH 800 // don't know if we need this yet
+#define FRONT_SHARP_THRESH 1100
+#define RIGHT_SHARP_THRESH 1100
+#define RIGHT_SHARP_THRESH_SAMPLE_RETURN 600
 
 #define SAMPLE_IR_SIG ADC1BUF14
 #define IR_SIG_THRESH  700
