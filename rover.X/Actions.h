@@ -22,10 +22,15 @@
 void delay(long s);
 void stopMotors();
 void startMotors();
+void setDirectionRight();
+void setDirectionLeft();
+void setDirectionStraight();
 void goStraight(int speed);
 void turnAround();
 void turnRight();
 void turnLeft();
+void turnSlightRight();
+void turnSlightLeft();
 void moveForward(int stepsNeeded);
 void moveBackward(int stepsNeeded);
 
@@ -40,6 +45,8 @@ void turnLeftGetOnLine();
 void lineNav();
 void senseLine();
 int checkOffLine();
+int checkRight();
+int checkLeft();
 
 // Canyon navigation
 void canyonNav();
