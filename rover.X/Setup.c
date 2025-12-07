@@ -41,6 +41,9 @@ void configurePins() {
     _TRISB14 = 1;   //line right sensor
     _TRISB15 = 1;   //ball color sensor
 
+    // LED debugging
+    _TRISA0 = 0;
+    _TRISB7 = 0;
 }
 
 
