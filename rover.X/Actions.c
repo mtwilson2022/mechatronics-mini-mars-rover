@@ -401,7 +401,7 @@ void canyonNav() {
                     if (senseWallRight() && Collision()) {
                         canyonSensorState = WALL_RIGHT;
                     }
-                    else if (Collision()){
+                    else if (Collision() && senseWallLeft()){
                         canyonSensorState = WALL_LEFT;
                     }
                 }
@@ -434,6 +434,13 @@ void canyonNav() {
 
 int senseWallRight() {
     if (RIGHT_SHARP_SIG > RIGHT_SHARP_THRESH) {
+        return 1;
+    }
+    return 0;
+}
+
+int senseWallLeft(){
+    if (LEFT_SHARP_SIG > RIGHT_SHARP_THRESH){
         return 1;
     }
     return 0;
@@ -632,5 +639,4 @@ int checkLeft(){
     _OC2IE = 0;
     return 0;
 }
-
 
