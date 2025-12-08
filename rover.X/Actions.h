@@ -51,6 +51,7 @@ int checkLeft();
 // Canyon navigation
 void canyonNav();
 int senseWallRight();
+int senseWallLeft();
 int Collision();
 
 // Sample collection
@@ -66,4 +67,3 @@ void returnHome();
 void pointLaser();
 
 #endif	/* ACTIONS_H */
-
