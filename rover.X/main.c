@@ -45,6 +45,8 @@ int main(int argc, char** argv) {
                 if (lineSensorState == NO_ACTIVE) {
                     if (RIGHT_SHARP_SIG > RIGHT_SHARP_THRESH_CANYONSTART){
                         robotTaskState = CANYON_NAV;
+                        moveForward(300);
+                        break;
                     }
                 }
                 
@@ -84,9 +86,8 @@ int main(int argc, char** argv) {
                 
                 
             case CANYON_NAV:
-
                 
-                canyonNav(canyonSensorState);
+                canyonNav();
                 
                 if (senseLineEndOfTask()) {
                     turnRightGetOnLine();
