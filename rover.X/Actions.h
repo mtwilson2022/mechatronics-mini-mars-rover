@@ -12,7 +12,7 @@
  */
 
 #ifndef ACTIONS_H
-#define	ACTIONS_H
+#define    ACTIONS_H
 
 #include <xc.h>
 #include "Configurations.h"
@@ -22,16 +22,21 @@
 void delay(long s);
 void stopMotors();
 void startMotors();
+void setDirectionRight();
+void setDirectionLeft();
+void setDirectionStraight();
 void goStraight(int speed);
 void turnAround();
 void turnRight();
 void turnLeft();
+void turnSlightRight();
+void turnSlightLeft();
 void moveForward(int stepsNeeded);
 void moveBackward(int stepsNeeded);
 
 // Transitions between tasks
 void moveIntoCanyon(); // this one is maybe not necessary
-int senseLineEndOfCanyon();
+int senseLineEndOfTask();
 void turnRightGetOnLine();
 void turnLeftGetOnLine();
 
@@ -40,10 +45,13 @@ void turnLeftGetOnLine();
 void lineNav();
 void senseLine();
 int checkOffLine();
+int checkRight();
+int checkLeft();
 
 // Canyon navigation
 void canyonNav();
 int senseWallRight();
+int senseWallLeft();
 int Collision();
 
 // Sample collection
@@ -55,7 +63,8 @@ void depositBlackBall();
 void depositWhiteBall();
 
 // Data transmission
+void returnHome();
 void pointLaser();
 
-#endif	/* ACTIONS_H */
-
+void startMission();
+#endif    /* ACTIONS_H */
