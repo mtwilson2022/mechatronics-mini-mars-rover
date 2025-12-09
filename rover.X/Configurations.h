@@ -11,7 +11,7 @@
  */
 
 #ifndef CONFIGURATIONS_H
-#define	CONFIGURATIONS_H
+#define    CONFIGURATIONS_H
 
 //************ Define statements ************
 
@@ -23,7 +23,10 @@
 #define DUTY PERIOD*0.5
 
 #define FULL_SPEED 0 // used when setting speed of the motors
-#define CANYON_SPEED 1
+#define HALF_SPEED 1
+#define QUARTER_SPEED 2
+#define RIGHT_TURN_STEPS 557
+#define LEFT_TURN_STEPS 557
 
 #define SERVO_PERIOD 4999
 #define BLOCK_BALL 250
@@ -31,7 +34,7 @@
 
 // Laser
 #define TRANSMIT ADC1BUF15
-#define TRANSMIT_THRESHOLD 2000
+#define TRANSMIT_THRESHOLD 500
 #define LASER _LATA4
 
 #define SERVO_PERIOD 4999
@@ -41,24 +44,25 @@
 
 // Sensing
 
-#define RIGHT_SONAR_SIG ADC1BUF13
-#define FRONT_SONAR_SIG ADC1BUF4
-#define SONAR_THRESHOLD 850  // 850 for 3.3 V; 1280 for 5 V probably gives same result
+#define RIGHT_SHARP_SIG ADC1BUF13
+#define LEFT_SHARP_SIG ADC1BUF0
+#define FRONT_SHARP_SIG ADC1BUF4
+#define FRONT_SHARP_THRESH 900
+#define FRONT_SHARP_THRESH_START 800
+#define RIGHT_SHARP_THRESH 600
+#define RIGHT_SHARP_THRESH_CANYONSTART 1000
+#define RIGHT_SHARP_THRESH_SAMPLE_RETURN 1200
 
 #define SAMPLE_IR_SIG ADC1BUF14
-#define IR_SIG_THRESH  500
+#define IR_SIG_THRESH  900
 
+#define FAR_LEFT_LINE_SIG ADC1BUF1
 #define LEFT_LINE_SIG  ADC1BUF10
 #define RIGHT_LINE_SIG  ADC1BUF12
 #define CENTER_LINE_SIG  ADC1BUF11
 #define BALL_COLOR_SIG  ADC1BUF9
-#define LINE_SENSOR_THRESHOLD 2048
+#define LINE_SENSOR_THRESHOLD 1200
 
-
-// Debugging
-#define STRAIGHT_LED _LATB8
-#define LEFT_LED _LATB7
-#define RIGHT_LED _LATB9
 
 
 //************ Global variables ************
@@ -75,5 +79,6 @@ typedef enum {STRAIGHT, WALL_RIGHT, WALL_LEFT} CanyonSensorState;
 typedef enum {LEFT, LEFT_CENTER, CENTER, RIGHT_CENTER, RIGHT, NO_ACTIVE} LineSensorState;
 
 
-#endif	/* CONFIGURATIONS_H */
+#endif    /* CONFIGURATIONS_H */
+
 
