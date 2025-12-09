@@ -405,7 +405,7 @@ void canyonNav() {
                     if (senseWallRight() && Collision()) {
                         canyonSensorState = WALL_RIGHT;
                     }
-                    else if (Collision() && senseWallLeft()){
+                    else if (Collision()){
                         canyonSensorState = WALL_LEFT;
                     }
                 }
@@ -469,7 +469,7 @@ void collectSample() {
     turnRight();
     moveForward(715); // number of steps to push the wall to get the sample
     delay(20000);
-    moveBackward(715);
+    moveBackward(690);
     turnLeft();
     moveForward(350);
 }
@@ -506,7 +506,7 @@ void depositBlackBall() {
     OC1R = DROP_BALL;   // turn servo to deposit ball
     delay(20000);
     OC1R = BLOCK_BALL;
-    moveBackward(175);
+    moveBackward(165);
     delay(5000);
     turnLeft();
     delay(5000);
@@ -523,7 +523,7 @@ void depositWhiteBall() {
     delay(5000);
     turnLeft();
     delay(5000);
-    moveForward(175);   //if ball drops not far enough to box, increase. 
+    moveForward(185);   //if ball drops not far enough to box, increase. 
     delay(5000);
     OC1R = DROP_BALL;   // turn servo to deposit ball
     delay(20000);
