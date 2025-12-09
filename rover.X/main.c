@@ -30,17 +30,10 @@ int main(int argc, char** argv) {
     setupMotors();
     configAD();
     
-    // debugging pins
-    _LATA0 = 0;
-    _LATB7 = 0;
+
     
 //////////////start code (hardcoded for start)/////////
-    while(!(FRONT_SHARP_SIG > FRONT_SHARP_THRESH_START)) {
-        continue;
-    }
-    goStraight(QUARTER_SPEED);
-    moveForward(800);
-    turnLeftGetOnLine();
+//    startMission();
 ///////////////////////////////////////////////////////
     
     while (1) {
@@ -48,38 +41,39 @@ int main(int argc, char** argv) {
             case LINE_FOLLOW:
                 
                 lineNav();      
+                                
+//                if (lineSensorState == NO_ACTIVE) {
+//                    if (checkOffLine()){
+//                        robotTaskState = CANYON_NAV;
+//                    }
+//                }
                 
                 ////////Code to start data transmission module/////////////////////////
                 /////// Currently having issues detecting line to turn into lander!                
-                if ((sampleReturned == 1) && (FAR_LEFT_LINE_SIG < LINE_SENSOR_THRESHOLD) && (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD) 
-                        && (LEFT_LINE_SIG < LINE_SENSOR_THRESHOLD)) {
-                    _LATA0 = 1; // DEBUGGING
-                    stopMotors();
-                    delay(20000);
-                    if ((FAR_LEFT_LINE_SIG < LINE_SENSOR_THRESHOLD) && (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD) 
-                        && (LEFT_LINE_SIG < LINE_SENSOR_THRESHOLD)) {
-                        _LATB7 = 1;  // DEBUGGING
-                        robotTaskState = DATA_TRANSMIT;
-                    }
-                    else {
-                        _LATA0 = 0;
-                        startMotors();
-                    }
-                }
+//                if ((sampleReturned == 1) && (FAR_LEFT_LINE_SIG < LINE_SENSOR_THRESHOLD) && (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD) 
+//                        && (LEFT_LINE_SIG < LINE_SENSOR_THRESHOLD)) {
+//                    _LATA0 = 1; // DEBUGGING
+//                    stopMotors();
+//                    delay(20000);
+//                    if ((FAR_LEFT_LINE_SIG < LINE_SENSOR_THRESHOLD) && (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD) 
+//                        && (LEFT_LINE_SIG < LINE_SENSOR_THRESHOLD)) {
+//                        _LATB7 = 1;  // DEBUGGING
+//                        robotTaskState = DATA_TRANSMIT;
+//                    }
+//                    else {
+//                        _LATA0 = 0;
+//                        startMotors();
+//                    }
+//                }
                 //////////////////////////////////////////////////////////////////////////////////////////////////
-                
-                else if (lineSensorState == NO_ACTIVE) {
-                    if (checkOffLine()){
-                        robotTaskState = CANYON_NAV;
-                    }
-                }
+
 
                 
-                else if ((lineSensorState == CENTER) && (SAMPLE_IR_SIG > IR_SIG_THRESH)) {
+                if ((sampleCollected == 0) && (SAMPLE_IR_SIG > IR_SIG_THRESH)) {
                         robotTaskState = SAMPLE_COLLECT;
                 } 
 //                
-                else if ((lineSensorState == CENTER) && (RIGHT_SHARP_SIG > RIGHT_SHARP_THRESH_SAMPLE_RETURN)) {
+                if (RIGHT_SHARP_SIG > RIGHT_SHARP_THRESH_SAMPLE_RETURN) {
                     if ((sampleCollected == 1) && (sampleReturned == 0)) {
                         robotTaskState = SAMPLE_RETURN;
                     }
