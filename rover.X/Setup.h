@@ -9,7 +9,7 @@
  */
 
 #ifndef SETUP_H
-#define	SETUP_H
+#define    SETUP_H
 
 #include <xc.h>
 #include "Configurations.h"
@@ -20,5 +20,6 @@ void setupMotors();
 void configAD();
 
 
-#endif	/* SETUP_H */
+#endif    /* SETUP_H */
+
 
