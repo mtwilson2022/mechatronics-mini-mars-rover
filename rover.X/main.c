@@ -43,12 +43,20 @@ int main(int argc, char** argv) {
                 lineNav();      
                 
                 if (lineSensorState == NO_ACTIVE) {
+                    OC2RS = PERIOD;
+                    OC3RS = PERIOD;
+                    OC2R = 0;
+                    OC3R = 0;
                     if (RIGHT_SHARP_SIG > RIGHT_SHARP_THRESH_CANYONSTART){
                         robotTaskState = CANYON_NAV;
-                        moveForward(300);
+                        OC2RS = PERIOD*2;
+                        OC3RS = PERIOD*2;
+                        OC2R = DUTY;
+                        OC3R = DUTY;
                         break;
                     }
                 }
+                
                 
                 ////////Code to start data transmission module/////////////////////////
                 /////// Currently having issues detecting line to turn into lander!                
@@ -92,6 +100,10 @@ int main(int argc, char** argv) {
                 if (senseLineEndOfTask()) {
                     turnRightGetOnLine();
                     robotTaskState = LINE_FOLLOW;
+                    OC2RS = PERIOD;
+                    OC3RS = PERIOD;
+                    OC2R = PERIOD/2;
+                    OC3R = PERIOD/2;
                 }
                 
                 break;
