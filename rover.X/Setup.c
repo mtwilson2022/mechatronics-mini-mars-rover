@@ -23,9 +23,11 @@ void configurePins() {
     _ANSB2 = 1;     //sonar front sensor
     _ANSA1 = 1;     //far left QRD  sensor
     _ANSA2 = 1;     //second sonar sensor
+    _ANSA0 = 1;     //Left Sonar
     _ANSA3 = 1;     //IR right sensor
     _ANSB4 = 1;     //IR satellite sensor
     _ANSB15 = 1;    //ball color sensor
+    
     
     _TRISA0 = 0;    //not used
     _TRISA4 = 0;    //laser
@@ -40,6 +42,9 @@ void configurePins() {
     _TRISB14 = 1;   //line right sensor
     _TRISB15 = 1;   //ball color sensor
 
+    // LED debugging
+    _TRISA0 = 0;
+    _TRISB7 = 0;
 }
 
 
@@ -68,7 +73,7 @@ void configAD() {
                     // results appear in ADC1BUF12
     _CSCNA = 1;     // AD1CON2<10> -- Scans inputs specified in AD1CSSx
                     // registers
-    _SMPI = 8;    // AD1CON2<6:2> -- Results sent to buffer after n conversion
+    _SMPI = 9;    // AD1CON2<6:2> -- Results sent to buffer after n conversion
                     // For example, if you are sampling 4 channels, you
                     // should have _SMPI = 3;
     _ALTS = 0;      // AD1CON2<0> -- Sample MUXA only
@@ -84,7 +89,7 @@ void configAD() {
     
     // AD1CSSL register
     // SET THE BITS CORRESPONDING TO CHANNELS THAT YOU WANT TO SAMPLE
-    AD1CSSL = 0b1111111000010010;
+    AD1CSSL = 0b1111111000010011;
     
     _ADON = 1;      // AD1CON1<15> -- Turn on A/D
 }
