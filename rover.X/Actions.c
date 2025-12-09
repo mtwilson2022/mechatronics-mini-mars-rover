@@ -28,7 +28,6 @@ int motorSteps = 0;          //step counter for stepper motor
 int stepsNeeded = 0;         // Desired steps for motor(s))
 int foundLine = 0;
 
-
 //----------
 //Interrupts
 //----------
@@ -65,6 +64,20 @@ void startMotors() {
     OC3R = DUTY;
 }
 
+void setDirectionRight(){
+    DIRECTION_MOTOR_ONE = 0;
+    DIRECTION_MOTOR_TWO = 0;
+}
+
+void setDirectionLeft(){
+    DIRECTION_MOTOR_ONE = 1;
+    DIRECTION_MOTOR_TWO = 1;
+}
+
+void setDirectionStraight(){
+    DIRECTION_MOTOR_ONE = 0;
+    DIRECTION_MOTOR_TWO = 1;
+}
 
 /* in the speed parameter, pass in one of the following #define statements: 
  * (from the Configurations.h file)
@@ -84,10 +97,10 @@ void goStraight(int speed) {
     }
     
     _OC2IE = 0;
-    OC2R = DUTY;
-    OC3R = DUTY;
     DIRECTION_MOTOR_ONE = 0;
     DIRECTION_MOTOR_TWO = 1;
+    OC2R = DUTY;
+    OC3R = DUTY;
 }
 
 
@@ -121,17 +134,14 @@ void turnAround() {
  * Executes a 90 degree right turn.
  */
 void turnRight() {
-    
     _OC2IE = 0; //stop counting steps
     stopMotors();
-
     DIRECTION_MOTOR_ONE = 0; //change direction for turn
     DIRECTION_MOTOR_TWO = 0;
     motorSteps = 0;
-    stepsNeeded = 575;
+    stepsNeeded = RIGHT_TURN_STEPS;
     _OC2IE = 1; //enable counting steps again
     startMotors();
-    
     while (motorSteps <= stepsNeeded) {
         continue;
     }
@@ -139,23 +149,19 @@ void turnRight() {
     stopMotors();
     delay(5000);
 }
-
 
 /*
  * Executes a 90 degree left turn.
  */
 void turnLeft() {
-    
     _OC2IE = 0; //stop counting steps
     stopMotors();
-
     DIRECTION_MOTOR_ONE = 1; //change direction for turn
     DIRECTION_MOTOR_TWO = 1;
     motorSteps = 0;
-    stepsNeeded = 575;
+    stepsNeeded = LEFT_TURN_STEPS;
     _OC2IE = 1; //enable counting steps again
     startMotors();
-    
     while (motorSteps <= stepsNeeded) {
         continue;
     }
@@ -163,6 +169,43 @@ void turnLeft() {
     stopMotors();
     delay(5000);
 }
+
+// 45 degree right turn
+void turnSlightRight() {
+    _OC2IE = 0; //stop counting steps
+    stopMotors();
+    DIRECTION_MOTOR_ONE = 0; //change direction for turn
+    DIRECTION_MOTOR_TWO = 0;
+    motorSteps = 0;
+    stepsNeeded = RIGHT_TURN_STEPS/2;
+    _OC2IE = 1; //enable counting steps again
+    startMotors();
+    while (motorSteps <= stepsNeeded) {
+        continue;
+    }
+    // stop motors at the end of it
+    stopMotors();
+    delay(5000);
+}
+
+//45 degree left turn
+void turnSlightLeft() {
+    _OC2IE = 0; //stop counting steps
+    stopMotors();
+    DIRECTION_MOTOR_ONE = 1; //change direction for turn
+    DIRECTION_MOTOR_TWO = 1;
+    motorSteps = 0;
+    stepsNeeded = LEFT_TURN_STEPS/2;
+    _OC2IE = 1; //enable counting steps again
+    startMotors();
+    while (motorSteps <= stepsNeeded) {
+        continue;
+    }
+    // stop motors at the end of it
+    stopMotors();
+    delay(5000);
+}
+
 
 
 /*
@@ -224,32 +267,16 @@ int senseLineEndOfTask() {
  * resuming line following.
  */
 void turnRightGetOnLine() {
-    stopMotors();
-    delay(5000);
-//    moveBackward(200);
-    
-    // make a ~30 degree right turn
-    _OC2IE = 0; //stop counting steps
-    stopMotors();
-    DIRECTION_MOTOR_ONE = 0; //change direction for turn
-    DIRECTION_MOTOR_TWO = 0;
-    motorSteps = 0;
-    stepsNeeded = 300;
-    _OC2IE = 1; //enable counting steps again
-    startMotors();
-    while (motorSteps <= stepsNeeded) {
-        continue;
-    }
-    // stop motors at the end of it
-    stopMotors();
-    delay(5000);
-    
+    goStraight(HALF_SPEED);     //reduces speed
+    stopMotors();    
+    turnSlightRight();
     while (1) {
         goStraight(HALF_SPEED);
         if (RIGHT_LINE_SIG < LINE_SENSOR_THRESHOLD) {
             break;
         }
-    }   
+    }
+    goStraight(FULL_SPEED); //sets speed back to lineNav();
 }
 
 /* 
@@ -257,33 +284,16 @@ void turnRightGetOnLine() {
  * resuming line following.
  */
 void turnLeftGetOnLine() {
-    stopMotors();
-    delay(5000);
-//    moveBackward(200);
-    
-    // make a ~30 degree right turn
-    _OC2IE = 0; //stop counting steps
-    stopMotors();
-    DIRECTION_MOTOR_ONE = 1; //change direction for turn
-    DIRECTION_MOTOR_TWO = 1;
-    motorSteps = 0;
-    stepsNeeded = 300;
-    _OC2IE = 1; //enable counting steps again
-    startMotors();
-    while (motorSteps <= stepsNeeded) {
-        continue;
-    }
-    // stop motors at the end of it
-    stopMotors();
-    delay(5000);
-    
+    goStraight(HALF_SPEED); //reduces speed
+    stopMotors();  
+    turnSlightLeft();
     while (1) {
         goStraight(HALF_SPEED);
-        senseLine();
-        if (!(lineSensorState == NO_ACTIVE)){
+        if (LEFT_LINE_SIG < LINE_SENSOR_THRESHOLD) {
             break;
         }
-    }     
+    } 
+    goStraight(FULL_SPEED); //sets speed back to lineNav.
 }
 
 //----------------------------------------------
@@ -375,77 +385,6 @@ void senseLine() {
     }
 }
 
-
-int checkOffLine() {
-    foundLine = 0;
-    OC2R = 0;
-    OC3R = 0;
-    OC2RS = PERIOD * 4;
-    OC3RS = PERIOD * 4;
-    DIRECTION_MOTOR_ONE = 0;
-    DIRECTION_MOTOR_TWO = 0;
-    _OC2IE = 1;
-    motorSteps = 0;
-    OC2R = DUTY;
-    OC3R = DUTY;
-    while (motorSteps <= 384){
-        senseLine();
-        if (!(lineSensorState == NO_ACTIVE)){
-            _OC2IE = 0;
-            OC2R = 0;
-            OC3R = 0;
-            foundLine = 1;
-            break;
-            }
-    }
-    if (foundLine == 0){
-        _OC2IE = 0;
-        OC2R = 0;
-        OC3R = 0;
-        DIRECTION_MOTOR_ONE = 1;
-        DIRECTION_MOTOR_TWO = 1;
-        _OC2IE = 1;
-        motorSteps = 0;
-        OC2R = DUTY;
-        OC3R = DUTY;
-        while (motorSteps <= 384*2){
-            senseLine();
-            if (!(lineSensorState == NO_ACTIVE)){
-                _OC2IE = 0;
-                OC2R = 0;
-                OC3R = 0;
-                foundLine = 1;
-                break;
-                }
-            }
-        }
-    if (foundLine == 0){
-        _OC2IE = 0;
-        OC2R = 0;
-        OC3R = 0;
-        DIRECTION_MOTOR_ONE = 0;
-        DIRECTION_MOTOR_TWO = 0;
-        _OC2IE = 1;
-        motorSteps = 0;
-        OC2R = DUTY;
-        OC3R = DUTY;
-        while (motorSteps <= 384){
-            continue;
-        }
-    }
-    _OC2IE = 0;
-    OC2R = 0;
-    OC3R = 0;
-    OC2RS = PERIOD;
-    OC3RS = PERIOD;
-    DIRECTION_MOTOR_ONE = 0;
-    DIRECTION_MOTOR_TWO = 1;
-    if (foundLine){
-        return 0;
-    }
-    return 1;
-}
-
 //---------------------------------------------------
 //********** Canyon sensing and navigating **********
 //---------------------------------------------------
@@ -458,11 +397,11 @@ void canyonNav() {
 
                 if (Collision()) {
                     stopMotors();
-                    delay(20000);
+                    delay(5000);
                     if (senseWallRight() && Collision()) {
                         canyonSensorState = WALL_RIGHT;
                     }
-                    else if (Collision()){
+                    else if (Collision() && senseWallLeft()){
                         canyonSensorState = WALL_LEFT;
                     }
                 }
@@ -472,8 +411,9 @@ void canyonNav() {
             case WALL_RIGHT:
                 stopMotors();
                 delay(5000);
+                OC2RS = PERIOD * 4;
+                OC3RS = PERIOD * 4;
                 turnLeft();
-
                 canyonSensorState = STRAIGHT;
                 
                 break;
@@ -481,8 +421,9 @@ void canyonNav() {
             case WALL_LEFT:
                 stopMotors();
                 delay(5000);
+                OC2RS = PERIOD * 4;
+                OC3RS = PERIOD * 4;
                 turnRight();
-                
                 canyonSensorState = STRAIGHT;
 
                 break;
@@ -493,6 +434,13 @@ void canyonNav() {
 
 int senseWallRight() {
     if (RIGHT_SHARP_SIG > RIGHT_SHARP_THRESH) {
+        return 1;
+    }
+    return 0;
+}
+
+int senseWallLeft(){
+    if (LEFT_SHARP_SIG > RIGHT_SHARP_THRESH){
         return 1;
     }
     return 0;
@@ -511,16 +459,15 @@ int Collision() {
 //----------------------------------------------------------------
 
 void collectSample() {
+    delay(5000);
+    goStraight(QUARTER_SPEED); // slow down the robot so it doesn't crash
+    moveForward(150);
     turnRight();
-    goStraight(HALF_SPEED); // slow down the robot so it doesn't crash
-    stopMotors();
-    moveForward(400); // number of steps to push the wall to get the sample
+    moveForward(825); // number of steps to push the wall to get the sample
     delay(20000);
-    moveBackward(400);
-    delay(20000);
+    moveBackward(300);
     turnLeft();
-    
-
+    turnLeftGetOnLine();
 }
 
 
@@ -545,49 +492,42 @@ int senseBallWhite() {
  * robot to the line, whereupon it resumes line following.
  */
 void depositBlackBall() {
-    _LATB7 = 0;
-    _LATB8 = 0;
-    _LATB9 = 1;
-    
+    goStraight(HALF_SPEED);     //sets speed to half
+    stopMotors();
     turnRight();
-    moveForward(400);
-    
-    // turn servo to deposit ball
-    OC1R = DROP_BALL;
+    delay(5000);
+    moveForward(350);   //if ball drops not far enough to box, increase.
+    delay(5000);
+    OC1R = DROP_BALL;   // turn servo to deposit ball
     delay(20000);
     OC1R = BLOCK_BALL;
-    
-    moveBackward(400);
+    moveBackward(350);
+    delay(5000);
     turnLeft();
-    
-    // may need something to ensure it gets on the line before proceeding
-    goStraight(FULL_SPEED);
+    delay(5000);
+    goStraight(FULL_SPEED); //sets speed back to lineNav speed.
 }
 
 /*
  * Similar to depositBlackBall(), but brings the robot to the white ball return.
  */
 void depositWhiteBall() {
-    _LATB7 = 1;
-    _LATB8 = 0;
-    _LATB9 = 0;
-    
-    moveForward(600);
+    goStraight(HALF_SPEED);     //sets speed to half
+    stopMotors();
+    moveForward(600);       //if ball drops too far left, increase.
+    delay(5000);
     turnLeft();
-    
-    moveForward(400);
-
-    
-    // turn servo to deposit ball
-    OC1R = DROP_BALL;
+    delay(5000);
+    moveForward(350);   //if ball drops not far enough to box, increase. 
+    delay(5000);
+    OC1R = DROP_BALL;   // turn servo to deposit ball
     delay(20000);
     OC1R = BLOCK_BALL;
-    
-    moveBackward(400);
+    moveBackward(350);  
+    delay(5000);
     turnRight();
-    
-    // may need something to ensure it gets on the line before proceeding
-    goStraight(FULL_SPEED);
+    delay(5000);
+    goStraight(FULL_SPEED); //sets speed back to lineNav speed.
 }
 
 //---------------------------------------------
@@ -595,22 +535,13 @@ void depositWhiteBall() {
 //---------------------------------------------
 
 void returnHome() {
-//    moveBackward(300);
-//    turnLeftGetOnLine();
-//    senseLine();
-//    while (!(lineSensorState == NO_ACTIVE)) {
-//        lineNav();
-//    }
-    moveForward(200); // change until it is centered in the lander
-    turnLeft();
-    moveForward(800);
+    
 }
 
 void pointLaser() {
      _OC1IE = 1; // interrupt is taking care of the servo motion
             
     while (1) {
-//        SERVO_ANGLE = VERTICAL;
         
         if (TRANSMIT > TRANSMIT_THRESHOLD) {
             _OC1IE = 0;
@@ -622,3 +553,89 @@ void pointLaser() {
     }
 }
 
+//if robot goes off the line during lineNav, this will turn right then left slightly to try to find the line again.
+//If does not find a line, will enter canyonNav.
+int checkOffLine() {
+    stopMotors();
+    foundLine = 0;
+    OC2RS = PERIOD * 4; //set speed to 1/4th
+    OC3RS = PERIOD * 4;
+    if (checkRight()){
+        foundLine = 1;
+    }
+    if (foundLine == 0){
+        if (checkLeft()){
+            foundLine = 1;
+        }
+    }
+    OC2RS = PERIOD; //reset speed to not interfere with lineNav.
+    OC2RS = PERIOD;
+    if (foundLine == 1){
+        return 0;
+    }
+    return 1;
+}
+
+int checkRight(){
+    delay(5000);
+    setDirectionRight();
+    _OC2IE = 1;
+    motorSteps = 0;
+    startMotors();
+    while (motorSteps <= RIGHT_TURN_STEPS/2){   //turns up to 45degree, sensing for line.
+        senseLine();
+        if (lineSensorState != NO_ACTIVE){
+            _OC2IE = 0;
+            stopMotors();
+            delay(5000);   //delay and double check to ensure sensor is correctly sensing.
+            if (lineSensorState != NO_ACTIVE){
+                return 1;               //return 1 if a line is sensed. Robot is now stopped on the line.
+            }                     //continues if double-check shows false positive
+            _OC2IE = 1;
+            startMotors();
+        }
+    }
+    stopMotors();
+    delay(5000);
+    setDirectionLeft();
+    motorSteps = 0;
+    startMotors();
+    while (motorSteps <= LEFT_TURN_STEPS/2){   //returns robot to front face if no line sensed
+        continue;
+    }
+    stopMotors();
+    _OC2IE = 0;
+    return 0;
+}
+
+int checkLeft(){
+    delay(5000);
+    setDirectionLeft();
+    _OC2IE = 1;
+    motorSteps = 0;
+    startMotors();
+    while (motorSteps <= LEFT_TURN_STEPS/2){   //turns up to 45degree, sensing for line.
+        senseLine();
+        if (lineSensorState != NO_ACTIVE){
+            _OC2IE = 0;
+            stopMotors();
+            delay(5000);   //delay and double check to ensure sensor is correctly sensing.
+            if (lineSensorState != NO_ACTIVE){
+                return 1;               //return 1 if a line is sensed. Robot is now stopped on the line.
+            }                     //continues if double-check shows false positive
+            _OC2IE = 1;
+            startMotors();
+        }
+    }
+    stopMotors();
+    delay(5000);
+    setDirectionRight();
+    motorSteps = 0;
+    startMotors();
+    while (motorSteps <= RIGHT_TURN_STEPS/2){   //returns robot to front face if no line sensed
+        continue;
+    }
+    stopMotors();
+    _OC2IE = 0;
+    return 0;
+}
