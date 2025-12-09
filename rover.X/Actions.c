@@ -150,6 +150,8 @@ void turnRight() {
         continue;
     }
     // stop motors at the end of it
+    DIRECTION_MOTOR_ONE = 0;
+    DIRECTION_MOTOR_ONE = 1;
     stopMotors();
     delay(5000);
 }
@@ -170,6 +172,8 @@ void turnLeft() {
         continue;
     }
     // stop motors at the end of it
+    DIRECTION_MOTOR_ONE = 0;
+    DIRECTION_MOTOR_ONE = 1;
     stopMotors();
     delay(5000);
 }
@@ -188,6 +192,8 @@ void turnSlightRight() {
         continue;
     }
     // stop motors at the end of it
+    DIRECTION_MOTOR_ONE = 0;
+    DIRECTION_MOTOR_ONE = 1;
     stopMotors();
     delay(5000);
 }
@@ -206,6 +212,8 @@ void turnSlightLeft() {
         continue;
     }
     // stop motors at the end of it
+    DIRECTION_MOTOR_ONE = 0;
+    DIRECTION_MOTOR_ONE = 1;
     stopMotors();
     delay(5000);
 }
@@ -397,7 +405,7 @@ void canyonNav() {
     switch (canyonSensorState) {
             
             case STRAIGHT:
-                goStraight(HALF_SPEED);
+
 
                 if (Collision()) {
                     stopMotors();
@@ -408,28 +416,31 @@ void canyonNav() {
                     else if (Collision()){
                         canyonSensorState = WALL_LEFT;
                     }
+                    else {
+                        startMotors();
+                    }
                 }
                 
                 break;
                 
             case WALL_RIGHT:
-                stopMotors();
-                delay(5000);
-                OC2RS = PERIOD * 4;
-                OC3RS = PERIOD * 4;
+//                stopMotors();
+//                delay(5000);
+//                OC2RS = PERIOD * 4;
+//                OC3RS = PERIOD * 4;
                 turnLeft();
                 canyonSensorState = STRAIGHT;
-                
+                startMotors();
                 break;
                 
             case WALL_LEFT:
-                stopMotors();
-                delay(5000);
-                OC2RS = PERIOD * 4;
-                OC3RS = PERIOD * 4;
+//                stopMotors();
+//                delay(5000);
+//                OC2RS = PERIOD * 4;
+//                OC3RS = PERIOD * 4;
                 turnRight();
                 canyonSensorState = STRAIGHT;
-
+                startMotors();
                 break;
         }
 
@@ -471,7 +482,7 @@ void collectSample() {
     delay(20000);
     moveBackward(690);
     turnLeft();
-    moveForward(350);
+    moveForward(300);
 }
 
 
