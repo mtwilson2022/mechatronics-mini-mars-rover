@@ -20,7 +20,8 @@
 RobotTaskState robotTaskState = LINE_FOLLOW;
 CanyonSensorState canyonSensorState = STRAIGHT;
 LineSensorState lineSensorState = CENTER;
-
+int sampleReturned = 0;
+int sampleCollected = 0;
 
 int main(int argc, char** argv) {
     _RCDIV = 0b100; // oscillator: divide by 16 postscaling (so Fosc = 500 kHz)
@@ -29,55 +30,61 @@ int main(int argc, char** argv) {
     setupMotors();
     configAD();
     
-    STRAIGHT_LED = 0;
-    LEFT_LED = 0;
-    RIGHT_LED = 0;
+
     
-//    static RobotTaskState robotTaskState = LINE_FOLLOW;
-//    
-//    CanyonSensorState canyonSensorState = RIGHT;
-//    static LineSensorState lineSensorState = GO_CENTER;
-//    
+//////////////start code (hardcoded for start)/////////
+//    startMission();
+///////////////////////////////////////////////////////
+    
     while (1) {
         switch (robotTaskState) {
             case LINE_FOLLOW:
                 
-                lineNav();
+                lineNav();      
                 
                 if (lineSensorState == NO_ACTIVE) {
                     if (checkOffLine()){
+                        delay(5000);
                         robotTaskState = CANYON_NAV;
                     }
-                    
                 }
                 
-//                if (SAMPLE_IR_SIG > IR_SIG_THRESH) {
-//                    robotTaskState = SAMPLE_COLLECT;
-//                    goStraight(FULL_SPEED);
-//                } 
                 
-//                if ((RIGHT_SONAR_SIG < SONAR_THRESHOLD) && (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD)) {
-//                    robotTaskState = SAMPLE_RETURN;
-//                    goStraight(FULL_SPEED);
-//                }
                 
-                // TODO: add transition to DATA_TRANSMIT
+                if ((sampleReturned == 1) && (FAR_LEFT_LINE_SIG < LINE_SENSOR_THRESHOLD) && (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD)) {
+                        stopMotors();
+                        delay(20000);
+                        robotTaskState = DATA_TRANSMIT;
+                }                
+
+
                 
+                if ((sampleCollected == 0) && (SAMPLE_IR_SIG > IR_SIG_THRESH)) {
+                        robotTaskState = SAMPLE_COLLECT;
+                } 
+                
+                
+                if (RIGHT_SHARP_SIG > RIGHT_SHARP_THRESH_SAMPLE_RETURN) {
+                    if ((sampleCollected == 1) && (sampleReturned == 0)) {
+                        robotTaskState = SAMPLE_RETURN;
+                    }
+                }
+
+
                 break;
                 
                 
             case CANYON_NAV:
                 
-//                STRAIGHT_LED = 0;
-//                LEFT_LED = 1;
-//                RIGHT_LED = 1;
+                canyonNav();
                 
-                canyonNav(canyonSensorState);
-                
-                if (senseLineEndOfCanyon()) {
-                    // *TODO* put something here to get the robot moving in the right direction
-                    
+                if (senseLineEndOfTask()) {
+                    turnRightGetOnLine();
                     robotTaskState = LINE_FOLLOW;
+                    OC2RS = PERIOD;
+                    OC3RS = PERIOD;
+                    OC2R = PERIOD/2;
+                    OC3R = PERIOD/2;
                 }
                 
                 break;
@@ -85,12 +92,9 @@ int main(int argc, char** argv) {
                 
             case SAMPLE_COLLECT:
                 stopMotors();
-                delay(10000);
                 collectSample();
-                
-                // have the robot back up and get on the line, then:
                 robotTaskState = LINE_FOLLOW;
-                
+                sampleCollected = 1;
                 break;
                 
                 
@@ -103,19 +107,21 @@ int main(int argc, char** argv) {
                 else {
                     depositBlackBall();
                 }
-                
-                delay(10000); // instead: turn right/left until on line
-                
-                // is the robot reliably on the line at this point?
+                delay(5000); 
                 robotTaskState = LINE_FOLLOW;
-                
+                sampleReturned = 1;
                 break;
                 
-            case DATA_TRANSMIT:
-                // move into lander (this could also be state transition logic)
                 
-                // move the pointer up slowly until it sees IR emitter.
-                // then turn on the laser. The course is complete.
+            case DATA_TRANSMIT:
+                goStraight(QUARTER_SPEED);  //sets speed
+                stopMotors();
+                moveForward(175);
+                turnLeft();
+                while (!(Collision())){
+                    lineNav();
+                }
+                stopMotors();
                 pointLaser();
                 break;
         }
