@@ -41,12 +41,12 @@ int main(int argc, char** argv) {
             case LINE_FOLLOW:
                 
                 lineNav();      
-                                
-//                if (lineSensorState == NO_ACTIVE) {
-//                    if (checkOffLine()){
-//                        robotTaskState = CANYON_NAV;
-//                    }
-//                }
+                
+                if (lineSensorState == NO_ACTIVE) {
+                    if (RIGHT_SHARP_SIG > RIGHT_SHARP_THRESH_CANYONSTART){
+                        robotTaskState = CANYON_NAV;
+                    }
+                }
                 
                 ////////Code to start data transmission module/////////////////////////
                 /////// Currently having issues detecting line to turn into lander!                
