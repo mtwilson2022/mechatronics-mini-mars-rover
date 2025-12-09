@@ -33,7 +33,7 @@ int main(int argc, char** argv) {
 
     
 //////////////start code (hardcoded for start)/////////
-//    startMission();
+    startMission();
 ///////////////////////////////////////////////////////
     
     while (1) {
@@ -47,6 +47,12 @@ int main(int argc, char** argv) {
                         delay(5000);
                         robotTaskState = CANYON_NAV;
                     }
+//                    stopMotors();
+//                    delay(20000);
+//                    senseLine();
+//                    if (lineSensorState == NO_ACTIVE) {
+//                        robotTaskState = CANYON_NAV;
+//                    }
                 }
                 
                 
@@ -114,14 +120,15 @@ int main(int argc, char** argv) {
                 
                 
             case DATA_TRANSMIT:
-                goStraight(QUARTER_SPEED);  //sets speed
+                goStraight(HALF_SPEED);  //sets speed
                 stopMotors();
-                moveForward(175);
+                moveForward(200);
                 turnLeft();
-                while (!(Collision())){
-                    lineNav();
-                }
-                stopMotors();
+//                while (!(Collision())){
+//                    lineNav();
+//                }
+//                stopMotors();
+                moveForward(2000);
                 pointLaser();
                 break;
         }

@@ -263,6 +263,16 @@ void moveBackward(int stepsNeeded) {
 // ********** Functions for transitions between task states **********
 //--------------------------------------------------------------------
 
+void startMission(){
+    while(!(FRONT_SHARP_SIG > FRONT_SHARP_THRESH_START)) {
+        continue;
+    }
+    goStraight(HALF_SPEED);
+    moveForward(2000);
+    turnLeft();
+}
+
+
 int senseLineEndOfTask() {
     if (   (RIGHT_LINE_SIG < LINE_SENSOR_THRESHOLD) 
         && (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD) 
@@ -289,6 +299,7 @@ void turnRightGetOnLine() {
         }
     }
     goStraight(FULL_SPEED); //sets speed back to lineNav();
+    
 }
 
 /* 
@@ -361,7 +372,6 @@ void lineNav() {
         }
 }
 
-
 void senseLine() {    
     if (!(   (RIGHT_LINE_SIG < LINE_SENSOR_THRESHOLD) 
           || (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD) 
@@ -394,174 +404,6 @@ void senseLine() {
     }
     else if (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD) {
         lineSensorState = CENTER;
-    }
-}
-
-//---------------------------------------------------
-//********** Canyon sensing and navigating **********
-//---------------------------------------------------
-
-void canyonNav() {
-    switch (canyonSensorState) {
-            
-            case STRAIGHT:
-                goStraight(HALF_SPEED);
-
-                if (Collision()) {
-                    stopMotors();
-                    delay(5000);
-                    if (senseWallRight() && Collision()) {
-                        canyonSensorState = WALL_RIGHT;
-                    }
-                    else if (Collision()){
-                        canyonSensorState = WALL_LEFT;
-                    }
-                    else {
-                        startMotors();
-                    }
-                }
-                
-                break;
-                
-            case WALL_RIGHT:
-                stopMotors();
-                delay(5000);
-                turnLeft();
-                canyonSensorState = STRAIGHT;
-                startMotors();
-                break;
-                
-            case WALL_LEFT:
-                stopMotors();
-                delay(5000);
-                turnRight();
-                canyonSensorState = STRAIGHT;
-                startMotors();
-                break;
-        }
-
-}
-
-
-int senseWallRight() {
-    if (RIGHT_SHARP_SIG > RIGHT_SHARP_THRESH) {
-        return 1;
-    }
-    return 0;
-}
-
-int senseWallLeft(){
-    if (LEFT_SHARP_SIG > RIGHT_SHARP_THRESH){
-        return 1;
-    }
-    return 0;
-}
-
-
-int Collision() {
-    if (FRONT_SHARP_SIG > FRONT_SHARP_THRESH) {
-        return 1;
-    }
-    return 0;
-}
-
-//----------------------------------------------------------------
-// ********** Sample collection: sensing and collecting **********
-//----------------------------------------------------------------
-
-void collectSample() {
-    delay(5000);
-    goStraight(QUARTER_SPEED); // slow down the robot so it doesn't crash
-    moveForward(400);
-    turnRight();
-    moveForward(715); // number of steps to push the wall to get the sample
-    delay(20000);
-    moveBackward(690);
-    turnLeft();
-    moveForward(300);
-}
-
-
-//------------------------------------------------------------
-// ********** Sample return: sensing and depositing **********
-//------------------------------------------------------------
-
-/*
- * If the ball in the collection ramp is white, returns true. If the ball is
- * black, returns false.
- */
-int senseBallWhite() {
-    if (BALL_COLOR_SIG < LINE_SENSOR_THRESHOLD) {
-        return 1;
-    }
-    return 0;
-}
-
-/*
- * This function brings the robot directly in front of the black ball return 
- * box, turns the servo to release the ball into the box, and returns the 
- * robot to the line, whereupon it resumes line following.
- */
-void depositBlackBall() {
-    goStraight(QUARTER_SPEED);     //sets speed to half
-    stopMotors();
-    moveForward(225);
-    turnRight();
-    delay(5000);
-    moveForward(175);   //if ball drops not far enough to box, increase.
-    delay(5000);
-    OC1R = DROP_BALL;   // turn servo to deposit ball
-    delay(20000);
-    OC1R = BLOCK_BALL;
-    moveBackward(165);
-    delay(5000);
-    turnLeft();
-    delay(5000);
-    goStraight(FULL_SPEED); //sets speed back to lineNav speed.
-}
-
-/*
- * Similar to depositBlackBall(), but brings the robot to the white ball return.
- */
-void depositWhiteBall() {
-    goStraight(QUARTER_SPEED);     //sets speed to half
-    stopMotors();
-    moveForward(600);       //if ball drops too far left, increase.
-    delay(5000);
-    turnLeft();
-    delay(5000);
-    moveForward(185);   //if ball drops not far enough to box, increase. 
-    delay(5000);
-    OC1R = DROP_BALL;   // turn servo to deposit ball
-    delay(20000);
-    OC1R = BLOCK_BALL;
-    moveBackward(175);  
-    delay(5000);
-    turnRight();
-    delay(5000);
-    goStraight(FULL_SPEED); //sets speed back to lineNav speed.
-}
-
-//---------------------------------------------
-//********** Data transmission tasks **********
-//---------------------------------------------
-
-void returnHome() {
-    
-}
-
-void pointLaser() {
-     _OC1IE = 1; // interrupt is taking care of the servo motion
-            
-    while (1) {
-        
-        if (TRANSMIT > TRANSMIT_THRESHOLD) {
-            _OC1IE = 0;
-            LASER = 1;
-        }
-        else if (SERVO_ANGLE >= VERTICAL) {
-            SERVO_ANGLE = HORIZONTAL;
-        }
     }
 }
 
@@ -652,11 +494,172 @@ int checkLeft(){
     return 0;
 }
 
-void startMission(){
-    while(!(FRONT_SHARP_SIG > FRONT_SHARP_THRESH_START)) {
-        continue;
-    }
-    goStraight(QUARTER_SPEED);
-    moveForward(2000);
-    turnLeft();
+
+//---------------------------------------------------
+//********** Canyon sensing and navigating **********
+//---------------------------------------------------
+
+void canyonNav() {
+    switch (canyonSensorState) {
+            
+            case STRAIGHT:
+                goStraight(HALF_SPEED);
+
+                if (Collision()) {
+                    stopMotors();
+                    delay(5000);
+                    if (senseWallRight() && Collision()) {
+                        canyonSensorState = WALL_RIGHT;
+                    }
+                    else if (Collision()){
+                        canyonSensorState = WALL_LEFT;
+                    }
+                    else {
+                        startMotors();
+                    }
+                }
+                
+                break;
+                
+            case WALL_RIGHT:
+                stopMotors();
+                delay(5000);
+                turnLeft();
+                canyonSensorState = STRAIGHT;
+                startMotors();
+                break;
+                
+            case WALL_LEFT:
+                stopMotors();
+                delay(5000);
+                turnRight();
+                canyonSensorState = STRAIGHT;
+                startMotors();
+                break;
+        }
+
 }
+
+
+int senseWallRight() {
+    if (RIGHT_SHARP_SIG > RIGHT_SHARP_THRESH) {
+        return 1;
+    }
+    return 0;
+}
+
+int senseWallLeft(){
+    if (LEFT_SHARP_SIG > RIGHT_SHARP_THRESH){
+        return 1;
+    }
+    return 0;
+}
+
+
+int Collision() {
+    if (FRONT_SHARP_SIG > FRONT_SHARP_THRESH) {
+        return 1;
+    }
+    return 0;
+}
+
+//----------------------------------------------------------------
+// ********** Sample collection: sensing and collecting **********
+//----------------------------------------------------------------
+
+void collectSample() {
+    delay(5000);
+    goStraight(HALF_SPEED); // slow down the robot so it doesn't crash
+    moveForward(400);
+    turnRight();
+    moveForward(715); // number of steps to push the wall to get the sample
+    delay(20000);
+    moveBackward(690);
+    turnLeft();
+    moveForward(300);
+}
+
+
+//------------------------------------------------------------
+// ********** Sample return: sensing and depositing **********
+//------------------------------------------------------------
+
+/*
+ * If the ball in the collection ramp is white, returns true. If the ball is
+ * black, returns false.
+ */
+int senseBallWhite() {
+    if (BALL_COLOR_SIG < LINE_SENSOR_THRESHOLD) {
+        return 1;
+    }
+    return 0;
+}
+
+/*
+ * This function brings the robot directly in front of the black ball return 
+ * box, turns the servo to release the ball into the box, and returns the 
+ * robot to the line, whereupon it resumes line following.
+ */
+void depositBlackBall() {
+    goStraight(HALF_SPEED);     //sets speed to half
+    stopMotors();
+    moveForward(225);
+    turnRight();
+    delay(5000);
+    moveForward(175);   //if ball drops not far enough to box, increase.
+    delay(5000);
+    OC1R = DROP_BALL;   // turn servo to deposit ball
+    delay(20000);
+    OC1R = BLOCK_BALL;
+    moveBackward(165);
+    delay(5000);
+    turnLeft();
+    delay(5000);
+    goStraight(FULL_SPEED); //sets speed back to lineNav speed.
+}
+
+/*
+ * Similar to depositBlackBall(), but brings the robot to the white ball return.
+ */
+void depositWhiteBall() {
+    goStraight(HALF_SPEED);     //sets speed to half
+    stopMotors();
+    moveForward(600);       //if ball drops too far left, increase.
+    delay(5000);
+    turnLeft();
+    delay(5000);
+    moveForward(185);   //if ball drops not far enough to box, increase. 
+    delay(5000);
+    OC1R = DROP_BALL;   // turn servo to deposit ball
+    delay(20000);
+    OC1R = BLOCK_BALL;
+    moveBackward(175);  
+    delay(5000);
+    turnRight();
+    delay(5000);
+    goStraight(FULL_SPEED); //sets speed back to lineNav speed.
+}
+
+//---------------------------------------------
+//********** Data transmission tasks **********
+//---------------------------------------------
+
+void returnHome() {
+    
+}
+
+void pointLaser() {
+     _OC1IE = 1; // interrupt is taking care of the servo motion
+            
+    while (1) {
+        
+        if (TRANSMIT > TRANSMIT_THRESHOLD) {
+            _OC1IE = 0;
+            LASER = 1;
+        }
+        else if (SERVO_ANGLE >= VERTICAL) {
+            SERVO_ANGLE = HORIZONTAL;
+        }
+    }
+}
+
