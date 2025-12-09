@@ -66,4 +66,5 @@ void depositWhiteBall();
 void returnHome();
 void pointLaser();
 
+void startMission();
 #endif	/* ACTIONS_H */
