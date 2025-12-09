@@ -21,4 +21,3 @@ void configAD();
 
 
 #endif	/* SETUP_H */
-
