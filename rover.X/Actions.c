@@ -95,6 +95,10 @@ void goStraight(int speed) {
         OC2RS = PERIOD * 2;
         OC3RS = PERIOD * 2;
     }
+    else if (speed == QUARTER_SPEED){
+        OC2RS = PERIOD * 4;
+        OC3RS = PERIOD * 4;
+    }
     
     _OC2IE = 0;
     DIRECTION_MOTOR_ONE = 0;
@@ -461,13 +465,13 @@ int Collision() {
 void collectSample() {
     delay(5000);
     goStraight(QUARTER_SPEED); // slow down the robot so it doesn't crash
-    moveForward(150);
+    moveForward(400);
     turnRight();
-    moveForward(825); // number of steps to push the wall to get the sample
+    moveForward(715); // number of steps to push the wall to get the sample
     delay(20000);
-    moveBackward(300);
+    moveBackward(715);
     turnLeft();
-    turnLeftGetOnLine();
+    moveForward(350);
 }
 
 
@@ -492,16 +496,17 @@ int senseBallWhite() {
  * robot to the line, whereupon it resumes line following.
  */
 void depositBlackBall() {
-    goStraight(HALF_SPEED);     //sets speed to half
+    goStraight(QUARTER_SPEED);     //sets speed to half
     stopMotors();
+    moveForward(225);
     turnRight();
     delay(5000);
-    moveForward(350);   //if ball drops not far enough to box, increase.
+    moveForward(175);   //if ball drops not far enough to box, increase.
     delay(5000);
     OC1R = DROP_BALL;   // turn servo to deposit ball
     delay(20000);
     OC1R = BLOCK_BALL;
-    moveBackward(350);
+    moveBackward(175);
     delay(5000);
     turnLeft();
     delay(5000);
@@ -512,18 +517,18 @@ void depositBlackBall() {
  * Similar to depositBlackBall(), but brings the robot to the white ball return.
  */
 void depositWhiteBall() {
-    goStraight(HALF_SPEED);     //sets speed to half
+    goStraight(QUARTER_SPEED);     //sets speed to half
     stopMotors();
     moveForward(600);       //if ball drops too far left, increase.
     delay(5000);
     turnLeft();
     delay(5000);
-    moveForward(350);   //if ball drops not far enough to box, increase. 
+    moveForward(175);   //if ball drops not far enough to box, increase. 
     delay(5000);
     OC1R = DROP_BALL;   // turn servo to deposit ball
     delay(20000);
     OC1R = BLOCK_BALL;
-    moveBackward(350);  
+    moveBackward(175);  
     delay(5000);
     turnRight();
     delay(5000);
@@ -638,4 +643,13 @@ int checkLeft(){
     stopMotors();
     _OC2IE = 0;
     return 0;
+}
+
+void startMission(){
+    while(!(FRONT_SHARP_SIG > FRONT_SHARP_THRESH_START)) {
+        continue;
+    }
+    goStraight(QUARTER_SPEED);
+    moveForward(2000);
+    turnLeft();
 }
