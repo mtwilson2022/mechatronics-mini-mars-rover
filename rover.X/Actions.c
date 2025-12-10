@@ -100,6 +100,10 @@ void goStraight(int speed) {
         OC2RS = PERIOD * 4;
         OC3RS = PERIOD * 4;
     }
+    else if (speed == TWO_THIRD_SPEED){
+        OC2RS = PERIOD * 3/2;
+        OC3RS = PERIOD * 3/2;
+    }
     
     _OC2IE = 0;
     DIRECTION_MOTOR_ONE = 0;
@@ -154,7 +158,7 @@ void turnRight() {
     DIRECTION_MOTOR_ONE = 0;
     DIRECTION_MOTOR_ONE = 1;
     stopMotors();
-    delay(5000);
+    delay(4000);
 }
 
 /*
@@ -176,7 +180,7 @@ void turnLeft() {
     DIRECTION_MOTOR_ONE = 0;
     DIRECTION_MOTOR_ONE = 1;
     stopMotors();
-    delay(5000);
+    delay(4000);
 }
 
 // 45 degree right turn
@@ -186,7 +190,7 @@ void turnSlightRight() {
     DIRECTION_MOTOR_ONE = 0; //change direction for turn
     DIRECTION_MOTOR_TWO = 0;
     motorSteps = 0;
-    stepsNeeded = RIGHT_TURN_STEPS/2;
+    stepsNeeded = RIGHT_TURN_STEPS * 2/3;
     _OC2IE = 1; //enable counting steps again
     startMotors();
     while (motorSteps <= stepsNeeded) {
@@ -196,7 +200,7 @@ void turnSlightRight() {
     DIRECTION_MOTOR_ONE = 0;
     DIRECTION_MOTOR_ONE = 1;
     stopMotors();
-    delay(5000);
+    delay(1000);
 }
 
 //45 degree left turn
@@ -206,7 +210,7 @@ void turnSlightLeft() {
     DIRECTION_MOTOR_ONE = 1; //change direction for turn
     DIRECTION_MOTOR_TWO = 1;
     motorSteps = 0;
-    stepsNeeded = LEFT_TURN_STEPS/2;
+    stepsNeeded = LEFT_TURN_STEPS * 2/3;
     _OC2IE = 1; //enable counting steps again
     startMotors();
     while (motorSteps <= stepsNeeded) {
@@ -216,7 +220,7 @@ void turnSlightLeft() {
     DIRECTION_MOTOR_ONE = 0;
     DIRECTION_MOTOR_ONE = 1;
     stopMotors();
-    delay(5000);
+    delay(1000);
 }
 
 
@@ -268,15 +272,15 @@ void startMission(){
     while(!(FRONT_SHARP_SIG > FRONT_SHARP_THRESH_START)) {
         continue;
     }
-    goStraight(HALF_SPEED);
-    moveForward(2000);
-    turnLeft();
+    goStraight(TWO_THIRD_SPEED);
+    moveForward(1600);
+    turnLeftGetOnLine();
 }
 
 int senseLineEndOfTask() {
-    if (   (RIGHT_LINE_SIG < LINE_SENSOR_THRESHOLD) 
-        && (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD) 
-        && (LEFT_LINE_SIG < LINE_SENSOR_THRESHOLD) ) {
+    if ( (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD) && 
+            ((RIGHT_LINE_SIG < LINE_SENSOR_THRESHOLD) || 
+            (LEFT_LINE_SIG < LINE_SENSOR_THRESHOLD)) ) {
         return 1;
     }
     return 0;
@@ -289,11 +293,11 @@ int senseLineEndOfTask() {
  * resuming line following.
  */
 void turnRightGetOnLine() {
-    goStraight(HALF_SPEED);     //reduces speed
+    goStraight(TWO_THIRD_SPEED);     //reduces speed
     stopMotors();    
     turnSlightRight();
     while (1) {
-        goStraight(HALF_SPEED);
+        goStraight(TWO_THIRD_SPEED);
         if (RIGHT_LINE_SIG < LINE_SENSOR_THRESHOLD) {
             break;
         }
@@ -307,11 +311,11 @@ void turnRightGetOnLine() {
  * resuming line following.
  */
 void turnLeftGetOnLine() {
-    goStraight(HALF_SPEED); //reduces speed
+    goStraight(TWO_THIRD_SPEED); //reduces speed
     stopMotors();  
     turnSlightLeft();
     while (1) {
-        goStraight(HALF_SPEED);
+        goStraight(TWO_THIRD_SPEED);
         if (LEFT_LINE_SIG < LINE_SENSOR_THRESHOLD) {
             break;
         }
@@ -535,12 +539,12 @@ void canyonNav() {
     switch (canyonSensorState) {
             
             case STRAIGHT:
-                goStraight(HALF_SPEED);
+                goStraight(TWO_THIRD_SPEED);
 
                 if (Collision()) {
-                    delay(1000);
+                    delay(1500);
                     stopMotors();
-                    delay(4000);
+                    delay(9000);
                     if (senseWallRight() && Collision()) {
                         canyonSensorState = WALL_RIGHT;
                     }
@@ -555,16 +559,12 @@ void canyonNav() {
                 break;
                 
             case WALL_RIGHT:
-                stopMotors();
-                delay(5000);
                 turnLeft();
                 canyonSensorState = STRAIGHT;
                 startMotors();
                 break;
                 
             case WALL_LEFT:
-                stopMotors();
-                delay(5000);
                 turnRight();
                 canyonSensorState = STRAIGHT;
                 startMotors();
@@ -601,15 +601,15 @@ int Collision() {
 //----------------------------------------------------------------
 
 void collectSample() {
-    delay(5000);
+    delay(1000);
     goStraight(HALF_SPEED); // slow down the robot so it doesn't crash
-    moveForward(400);
+    moveForward(300);
     turnRight();
-    moveForward(715); // number of steps to push the wall to get the sample
-    delay(20000);
+    moveForward(745); // number of steps to push the wall to get the sample
+    delay(10000);
     moveBackward(690);
     turnLeft();
-    moveForward(300);
+    moveForward(200);
 }
 
 
@@ -638,16 +638,16 @@ void depositBlackBall() {
     stopMotors();
     moveForward(225);
     turnRight();
-    delay(5000);
+//    delay(5000);
     moveForward(175);   //if ball drops not far enough to box, increase.
-    delay(5000);
+//    delay(5000);
     OC1R = DROP_BALL;   // turn servo to deposit ball
-    delay(20000);
+    delay(10000);
     OC1R = BLOCK_BALL;
     moveBackward(165);
-    delay(5000);
+//    delay(5000);
     turnLeft();
-    delay(5000);
+//    delay(5000);
     goStraight(FULL_SPEED); //sets speed back to lineNav speed.
 }
 
@@ -658,18 +658,18 @@ void depositWhiteBall() {
     goStraight(HALF_SPEED);     //sets speed to half
     stopMotors();
     moveForward(600);       //if ball drops too far left, increase.
-    delay(5000);
+//    delay(5000);
     turnLeft();
-    delay(5000);
+//    delay(5000);
     moveForward(185);   //if ball drops not far enough to box, increase. 
-    delay(5000);
+//    delay(5000);
     OC1R = DROP_BALL;   // turn servo to deposit ball
-    delay(20000);
+    delay(10000);
     OC1R = BLOCK_BALL;
     moveBackward(175);  
-    delay(5000);
+//    delay(5000);
     turnRight();
-    delay(5000);
+//    delay(5000);
     goStraight(FULL_SPEED); //sets speed back to lineNav speed.
 }
 
@@ -688,11 +688,14 @@ void pointLaser() {
         
         if (TRANSMIT > TRANSMIT_THRESHOLD) {
             _OC1IE = 0;
+            SERVO_ANGLE += 10;
             LASER = 1;
+            while (1) {
+                continue;
+            }
         }
         else if (SERVO_ANGLE >= VERTICAL) {
             SERVO_ANGLE = HORIZONTAL;
         }
     }
 }
-
