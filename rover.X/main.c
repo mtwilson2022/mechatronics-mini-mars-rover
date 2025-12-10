@@ -46,9 +46,9 @@ int main(int argc, char** argv) {
                     }
                 }
                 
-                if ((sampleReturned == 1) && (FAR_LEFT_LINE_SIG < LINE_SENSOR_THRESHOLD) && (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD)) {
+                if ((sampleReturned == 1) && (FAR_LEFT_LINE_SIG < FAR_LEFT_LINE_SENSOR_THRESHOLD) && (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD)) {
                         stopMotors();
-                        delay(20000);
+                        delay(3000);
                         robotTaskState = DATA_TRANSMIT;
                 }                
 
@@ -91,14 +91,14 @@ int main(int argc, char** argv) {
                 
             case SAMPLE_RETURN:
                 stopMotors();
-                delay(10000);
+                delay(3000);
                 if (senseBallWhite()) {
                     depositWhiteBall();
                 }
                 else {
                     depositBlackBall();
                 }
-                delay(5000); 
+                delay(3000); 
                 robotTaskState = LINE_FOLLOW;
                 sampleReturned = 1;
                 break;
@@ -107,14 +107,15 @@ int main(int argc, char** argv) {
             case DATA_TRANSMIT:
                 goStraight(HALF_SPEED);  //sets speed
                 stopMotors();
-                moveForward(200);
+                moveForward(265);
                 turnLeft();
-//                while (!(Collision())){
-//                    lineNav();
-//                }
-//                stopMotors();
                 moveForward(2000);
-                pointLaser();
+                if (Collision()) {
+                    pointLaser();
+                }
+                else {
+                    robotTaskState = LINE_FOLLOW;
+                }
                 break;
         }
 
