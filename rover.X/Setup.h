@@ -1,3 +1,4 @@
+
 /* 
  * File:   Setup.h
  * Authors: Matthew Wilson, Sean Reisinger, William Bowler, Caden Meyer
@@ -21,5 +22,3 @@ void configAD();
 
 
 #endif    /* SETUP_H */
-
-
