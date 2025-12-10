@@ -273,7 +273,6 @@ void startMission(){
     turnLeft();
 }
 
-
 int senseLineEndOfTask() {
     if (   (RIGHT_LINE_SIG < LINE_SENSOR_THRESHOLD) 
         && (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD) 
