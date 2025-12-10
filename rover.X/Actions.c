@@ -27,6 +27,7 @@ extern LineSensorState lineSensorState;
 int motorSteps = 0;          //step counter for stepper motor
 int stepsNeeded = 0;         // Desired steps for motor(s))
 int foundLine = 0;
+LineSensorState prevState;
 
 //----------
 //Interrupts
@@ -372,7 +373,9 @@ void lineNav() {
         }
 }
 
-void senseLine() {    
+void senseLine() {
+    prevState = lineSensorState;
+    
     if (!(   (RIGHT_LINE_SIG < LINE_SENSOR_THRESHOLD) 
           || (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD) 
           || (LEFT_LINE_SIG < LINE_SENSOR_THRESHOLD))) 
@@ -410,24 +413,54 @@ void senseLine() {
 //if robot goes off the line during lineNav, this will turn right then left slightly to try to find the line again.
 //If does not find a line, will enter canyonNav.
 int checkOffLine() {
-    stopMotors();
     foundLine = 0;
-    OC2RS = PERIOD * 4; //set speed to 1/4th
-    OC3RS = PERIOD * 4;
-    if (checkRight()){
-        foundLine = 1;
+//    stopMotors();
+    
+    if (prevState == CENTER) {
+        OC2RS = PERIOD*2; // go to canyon
+        OC2RS = PERIOD*2;
+        return 1;
     }
-    if (foundLine == 0){
-        if (checkLeft()){
+    else if ((prevState == RIGHT) || (prevState == RIGHT_CENTER)) {
+        OC2RS = PERIOD * 4; //set speed to 1/4th
+        OC3RS = PERIOD * 4;
+        if (checkLeft()) {
             foundLine = 1;
         }
     }
+    else if ((prevState == LEFT) || (prevState == LEFT_CENTER)) {
+        OC2RS = PERIOD * 4; //set speed to 1/4th
+        OC3RS = PERIOD * 4;
+        if (checkRight()) {
+            foundLine = 1;
+        }
+    }
+
     OC2RS = PERIOD; //reset speed to not interfere with lineNav.
     OC2RS = PERIOD;
     if (foundLine == 1){
         return 0;
     }
     return 1;
+    
+//    stopMotors();
+//    foundLine = 0;
+//    OC2RS = PERIOD * 4; //set speed to 1/4th
+//    OC3RS = PERIOD * 4;
+//    if (checkRight()){
+//        foundLine = 1;
+//    }
+//    if (foundLine == 0){
+//        if (checkLeft()){
+//            foundLine = 1;
+//        }
+//    }
+//    OC2RS = PERIOD; //reset speed to not interfere with lineNav.
+//    OC2RS = PERIOD;
+//    if (foundLine == 1){
+//        return 0;
+//    }
+//    return 1;
 }
 
 int checkRight(){
@@ -506,8 +539,9 @@ void canyonNav() {
                 goStraight(HALF_SPEED);
 
                 if (Collision()) {
+                    delay(1000);
                     stopMotors();
-                    delay(5000);
+                    delay(4000);
                     if (senseWallRight() && Collision()) {
                         canyonSensorState = WALL_RIGHT;
                     }

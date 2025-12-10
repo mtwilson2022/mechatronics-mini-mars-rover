@@ -33,7 +33,7 @@ int main(int argc, char** argv) {
 
     
 //////////////start code (hardcoded for start)/////////
-    startMission();
+//    startMission();
 ///////////////////////////////////////////////////////
     
     while (1) {
@@ -44,7 +44,7 @@ int main(int argc, char** argv) {
                 
                 if (lineSensorState == NO_ACTIVE) {
                     if (checkOffLine()){
-                        delay(5000);
+//                        delay(5000);
                         robotTaskState = CANYON_NAV;
                     }
 //                    stopMotors();
@@ -57,24 +57,24 @@ int main(int argc, char** argv) {
                 
                 
                 
-                if ((sampleReturned == 1) && (FAR_LEFT_LINE_SIG < LINE_SENSOR_THRESHOLD) && (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD)) {
-                        stopMotors();
-                        delay(20000);
-                        robotTaskState = DATA_TRANSMIT;
-                }                
-
-
-                
-                if ((sampleCollected == 0) && (SAMPLE_IR_SIG > IR_SIG_THRESH)) {
-                        robotTaskState = SAMPLE_COLLECT;
-                } 
-                
-                
-                if (RIGHT_SHARP_SIG > RIGHT_SHARP_THRESH_SAMPLE_RETURN) {
-                    if ((sampleCollected == 1) && (sampleReturned == 0)) {
-                        robotTaskState = SAMPLE_RETURN;
-                    }
-                }
+//                if ((sampleReturned == 1) && (FAR_LEFT_LINE_SIG < LINE_SENSOR_THRESHOLD) && (CENTER_LINE_SIG < LINE_SENSOR_THRESHOLD)) {
+//                        stopMotors();
+//                        delay(20000);
+//                        robotTaskState = DATA_TRANSMIT;
+//                }                
+//
+//
+//                
+//                if ((sampleCollected == 0) && (SAMPLE_IR_SIG > IR_SIG_THRESH)) {
+//                        robotTaskState = SAMPLE_COLLECT;
+//                } 
+//                
+//                
+//                if (RIGHT_SHARP_SIG > RIGHT_SHARP_THRESH_SAMPLE_RETURN) {
+//                    if ((sampleCollected == 1) && (sampleReturned == 0)) {
+//                        robotTaskState = SAMPLE_RETURN;
+//                    }
+//                }
 
 
                 break;
